@@ -1,0 +1,54 @@
+﻿<Page
+    x:Class="HomeAutomationUWP.Views.PoolMenu"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:HomeAutomationUWP.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:HomeAutomationUWP.Converters"
+    xmlns:controls="using:HomeAutomationUWP.Controls"
+    mc:Ignorable="d"
+    x:Name="poolMenu"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <converters:BoolToStringConverter x:Name="BoolToString"/>
+        <converters:BoolToOnOFfOpposite x:Name="BoolToOnOffOpposite"/>
+        <converters:IntToStringConverter x:Name="IntToString"/>
+        <converters:UShortToUShortConverter x:Name="UShortToUShort"/>
+        <converters:UShortToString x:Name="UShortToString"/>
+        <converters:StringToUShort x:Name="StringToUShort"/>
+    </Page.Resources>
+    
+    <!--<Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
+            <TextBlock Text="{Binding PoolPower, Converter={StaticResource BoolToString}, Mode=OneWay}" VerticalAlignment="Center"/>
+            <Button Content="{Binding PoolPower, Converter={StaticResource BoolToOnOffOpposite}, Mode=OneWay}"/>
+            
+        </StackPanel>
+        
+        <ScrollViewer Grid.Column="0" Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding ListOfTimeSelectors}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            
+        </ScrollViewer>
+    </Grid>-->
+    
+    <StackPanel>
+        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}}"/>
+    </StackPanel>
+</Page>
