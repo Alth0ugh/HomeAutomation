@@ -49,6 +49,6 @@
     </Grid>-->
     
     <StackPanel>
-        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}}"/>
+        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
     </StackPanel>
 </Page>

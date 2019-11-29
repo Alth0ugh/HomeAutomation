@@ -11,10 +11,6 @@
     d:DesignWidth="400"
     >
 
-    <UserControl.Resources>
-        <converters:UShortToString x:Name="UShortToString"/>
-    </UserControl.Resources>
-
     <StackPanel Orientation="Horizontal" x:Name="stackPanel">
         <TextBlock Text="Od" VerticalAlignment="Center" Margin="5"/>
         <TextBox x:Name="FromText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True"/>

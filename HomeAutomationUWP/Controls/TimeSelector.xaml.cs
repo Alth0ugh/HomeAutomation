@@ -38,20 +38,13 @@ namespace HomeAutomationUWP.Controls
             stackPanel.DataContext = this;
         }
 
-        //public event PropertyChangedEventHandler PropertyChanged;
-        //public static readonly DependencyProperty FromDependencyProperty = DependencyProperty.Register("From", typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create(0));
-        //public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register("To", typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create(0));
-
-        private int _from = 0;
-        private int _to = 1;
-
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(int), typeof(TimeSelector), PropertyMetadata.Create(10));
-        public int From
+        public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create(0));
+        public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create(0));
+        public ushort From
         {
             get
             {
-                return (int)GetValue(FromProperty);
-                //return _from;
+                return (ushort)GetValue(FromProperty);
             }
             set
             {
@@ -59,40 +52,33 @@ namespace HomeAutomationUWP.Controls
                 {
                     SetValue(FromProperty, value);
                     Debug.Write(value);
-                    _from = value;
-                    FromText.Text = _from.ToString();
+                    FromText.Text = GetValue(FromProperty).ToString();
                 }
                 else
                 {
-                    SetValue(FromProperty, 3);
-                    _from = 0;
-                    FromText.Text = _from.ToString();
+                    SetValue(FromProperty, (ushort)0);
+                    FromText.Text = GetValue(FromProperty).ToString();
                 }
-                //NotifyPropertyChanged("From");
             }
         }
-        public int To
+        public ushort To
         {
             get
             {
-                return _to;
-                //return (ushort)GetValue(ToDependencyProperty);
+                return (ushort)GetValue(ToDependencyProperty);
             }
             set
             {
                 if (value <= 24 && value >= 1 && value > From)
                 {
-                    _to = value;
-                    ToText.Text = _to.ToString();
-                  //  SetValue(ToDependencyProperty, value);
+                    SetValue(ToDependencyProperty, value);
+                    ToText.Text = GetValue(ToDependencyProperty).ToString();
                 }
                 else
                 {
-                    _to = 5;
-                    ToText.Text = _to.ToString();
-                    //SetValue(ToDependencyProperty, (ushort)4);
+                    SetValue(ToDependencyProperty, (ushort)1);
+                    ToText.Text = GetValue(ToDependencyProperty).ToString();
                 }
-                //NotifyPropertyChanged("To");
             }
         }
 
@@ -127,8 +113,7 @@ namespace HomeAutomationUWP.Controls
                     case ButtonTypes.FromTimeChange:
                         if (buttonContent == "+")
                         {
-                            //From++;
-                            From = (From + 1);
+                            From++;
                         }
                         else
                         {
@@ -152,8 +137,8 @@ namespace HomeAutomationUWP.Controls
 
     public class TimeSelectorCharacteristic
     {
-        public int FromTime { get; set; }
-        public int ToTime { get; set; }
+        public ushort FromTime { get; set; }
+        public ushort ToTime { get; set; }
         
     }
 

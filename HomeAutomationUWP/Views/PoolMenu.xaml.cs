@@ -24,34 +24,12 @@ namespace HomeAutomationUWP.Views
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class PoolMenu : Page, INotifyPropertyChanged
+    public sealed partial class PoolMenu : Page
     {
         public PoolMenu()
         {
             DataContext = new PoolMenuModel();
             this.InitializeComponent();
-        }
-
-        private int _fromTime = 10;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public int FromTime
-        {
-            get
-            {
-                return _fromTime;
-            }
-            set
-            {
-                _fromTime = value;
-                NotifyPropertyChanged("FromTime");
-            }
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

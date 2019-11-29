@@ -44,8 +44,8 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        private int _fromTime = 1;
-        public int FromTime
+        private ushort _fromTime = 1;
+        public ushort FromTime
         {
             get
             {
@@ -54,7 +54,7 @@ namespace HomeAutomationUWP.ViewModels
             set
             {
                 _fromTime = value;
-                Debug.WriteLine("FromTime: " + value);
+                Debug.WriteLine("FromTime changed: " + value);
                 NotifyPropertyChanged("FromTime");
             }
         }
