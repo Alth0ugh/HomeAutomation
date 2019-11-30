@@ -19,8 +19,8 @@
         <converters:UShortToString x:Name="UShortToString"/>
         <converters:StringToUShort x:Name="StringToUShort"/>
     </Page.Resources>
-    
-    <!--<Grid>
+
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -29,26 +29,27 @@
             <ColumnDefinition Width="5*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
+
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
             <TextBlock Text="{Binding PoolPower, Converter={StaticResource BoolToString}, Mode=OneWay}" VerticalAlignment="Center"/>
             <Button Content="{Binding PoolPower, Converter={StaticResource BoolToOnOffOpposite}, Mode=OneWay}"/>
-            
+
         </StackPanel>
-        
+
         <ScrollViewer Grid.Column="0" Grid.Row="1">
             <ItemsControl ItemsSource="{Binding ListOfTimeSelectors}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
+                        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"
+                                               To="{Binding ToTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            
+
         </ScrollViewer>
-    </Grid>-->
-    
-    <StackPanel>
-        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}}"/>
-    </StackPanel>
+    </Grid>
+
+    <!--<StackPanel>
+        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
+    </StackPanel>-->
 </Page>

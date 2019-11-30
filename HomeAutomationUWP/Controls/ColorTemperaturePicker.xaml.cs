@@ -12,23 +12,15 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using HomeAutomationUWP.ViewModels;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace HomeAutomationUWP.Views
+namespace HomeAutomationUWP.Controls
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class PoolMenu : Page
+    public sealed partial class ColorTemperaturePicker : UserControl
     {
-        public PoolMenu()
+        public ColorTemperaturePicker()
         {
-            DataContext = new PoolMenuModel();
             this.InitializeComponent();
         }
     }

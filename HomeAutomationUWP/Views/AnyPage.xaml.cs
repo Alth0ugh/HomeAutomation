@@ -13,9 +13,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using HomeAutomationUWP.ViewModels;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using HomeAutomationUWP.Navigation;
+using System.Windows.Input;
+using HomeAutomationUWP.Helper_classes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -24,12 +24,26 @@ namespace HomeAutomationUWP.Views
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class PoolMenu : Page
+    public sealed partial class AnyPage : Page
     {
-        public PoolMenu()
+        public AnyPage()
         {
-            DataContext = new PoolMenuModel();
             this.InitializeComponent();
+            Navigation.Navigation.Frame = frame;
+            SetCommands();
+            Navigation.Navigation.Navigate(typeof(Menu));
         }
+
+        private void SetCommands()
+        {
+            Pool = new RelayCommand(ShowPool);
+        }
+
+        private void ShowPool(object obj)
+        {
+            Navigation.Navigation.Navigate(typeof(PoolMenu));
+        }
+
+        public ICommand Pool { get; set; }
     }
 }

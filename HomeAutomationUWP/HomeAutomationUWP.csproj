@@ -119,6 +119,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ColorTemperaturePicker.xaml.cs">
+      <DependentUpon>ColorTemperaturePicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TimeSelector.xaml.cs">
       <DependentUpon>TimeSelector.xaml</DependentUpon>
     </Compile>
@@ -128,11 +131,25 @@
     <Compile Include="Converters\BoolToStringConverter.cs" />
     <Compile Include="Converters\IntToStringConverter.cs" />
     <Compile Include="Converters\UShortToString.cs" />
+    <Compile Include="Helper classes\RelayCommand.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Navigation\Navigation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\AnyPageModel.cs" />
+    <Compile Include="ViewModels\LightControlModel.cs" />
+    <Compile Include="ViewModels\MenuModel.cs" />
     <Compile Include="ViewModels\PoolMenuModel.cs" />
+    <Compile Include="Views\AnyPage.xaml.cs">
+      <DependentUpon>AnyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LightControl.xaml.cs">
+      <DependentUpon>LightControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Menu.xaml.cs">
+      <DependentUpon>Menu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PoolMenu.xaml.cs">
       <DependentUpon>PoolMenu.xaml</DependentUpon>
     </Compile>
@@ -144,6 +161,7 @@
     <None Include="HomeAutomationUWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\ColorTemperature.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -158,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Controls\ColorTemperaturePicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\TimeSelector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -165,6 +187,18 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AnyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LightControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Menu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PoolMenu.xaml">
       <SubType>Designer</SubType>

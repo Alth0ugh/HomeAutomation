@@ -30,7 +30,7 @@ namespace HomeAutomationUWP.ViewModels
         }
 
         //public static DependencyProperty ListOfTimeSelectorsDependencyProperty = DependencyProperty.Register("ListOfTimeSelectors", typeof(ObservableCollection<TimeSelectorCharacteristic>), typeof(PoolMenuModel), new PropertyMetadata(new ObservableCollection<TimeSelectorCharacteristic>()));
-        private ObservableCollection<TimeSelectorCharacteristic> _listOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>() { new TimeSelectorCharacteristic { FromTime = 0, ToTime = 1 } };
+        private ObservableCollection<TimeSelectorCharacteristic> _listOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>();
         public ObservableCollection<TimeSelectorCharacteristic> ListOfTimeSelectors
         {
             get
@@ -44,8 +44,8 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        private int _fromTime = 1;
-        public int FromTime
+        private ushort _fromTime = 1;
+        public ushort FromTime
         {
             get
             {
@@ -54,7 +54,7 @@ namespace HomeAutomationUWP.ViewModels
             set
             {
                 _fromTime = value;
-                Debug.WriteLine("FromTime: " + value);
+                Debug.WriteLine("FromTime changed: " + value);
                 NotifyPropertyChanged("FromTime");
             }
         }
@@ -64,7 +64,7 @@ namespace HomeAutomationUWP.ViewModels
             PoolPower = false;
             //ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>();
 
-            //ListOfTimeSelectors.Add(new TimeSelectorCharacteristic { From = 1, To = 2 });
+            ListOfTimeSelectors.Add(new TimeSelectorCharacteristic { FromTime = 5, ToTime = 6 });
             //ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { From = 1, To = 5});
         }
 
