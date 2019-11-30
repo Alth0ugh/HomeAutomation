@@ -32,14 +32,14 @@ namespace HomeAutomationUWP.Controls
             toIncrease.Tag = new ButtonTag(ButtonTypes.ToTimeChange);
             toDecrease.Tag = new ButtonTag(ButtonTypes.ToTimeChange);
 
-            From = 0;
-            To = 5;
+            //From = (ushort)0;
+            //To = (ushort)5;
 
             stackPanel.DataContext = this;
         }
 
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create(0));
-        public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create(0));
+        public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)0));
+        public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register(nameof(To), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)5));
         public ushort From
         {
             get

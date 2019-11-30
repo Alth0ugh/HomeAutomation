@@ -10,10 +10,13 @@
     d:DesignHeight="300"
     d:DesignWidth="400"
     >
-
+    <UserControl.Resources>
+        <converters:UShortToString x:Name="UShortToString"/>
+    </UserControl.Resources>
+    
     <StackPanel Orientation="Horizontal" x:Name="stackPanel">
         <TextBlock Text="Od" VerticalAlignment="Center" Margin="5"/>
-        <TextBox x:Name="FromText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True"/>
+        <TextBox x:Name="FromText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True" Text="{Binding From, Converter={StaticResource UShortToString}}"/>
         <Button x:Name="fromIncrease" Content="+" Click="ChangeTime" VerticalAlignment="Center" Margin="0,0,2,0"/>
         <Button x:Name="fromDecrease" Content="-" VerticalAlignment="Center" Margin="0,0,5,0"/>
         <TextBlock VerticalAlignment="Center" Margin="0,0,5,0" Text="do"/>
