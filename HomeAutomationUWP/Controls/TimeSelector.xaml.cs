@@ -57,7 +57,7 @@ namespace HomeAutomationUWP.Controls
                 else
                 {
                     SetValue(FromProperty, (ushort)0);
-                    FromText.Text = GetValue(FromProperty).ToString();
+                    //FromText.Text = GetValue(FromProperty).ToString();
                 }
             }
         }
@@ -135,11 +135,28 @@ namespace HomeAutomationUWP.Controls
         }
     }
 
-    public class TimeSelectorCharacteristic
+    public class TimeSelectorCharacteristic : INotifyPropertyChanged
     {
-        public ushort FromTime { get; set; }
+        private ushort _fromTime;
+        public ushort FromTime
+        {
+            get
+            {
+                return _fromTime;
+            }
+            set
+            {
+                _fromTime = value;
+                NotifyPropertyChanged("FromTime");
+            }
+        }
         public ushort ToTime { get; set; }
-        
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class ButtonTag
