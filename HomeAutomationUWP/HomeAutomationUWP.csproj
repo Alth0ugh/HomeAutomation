@@ -128,11 +128,21 @@
     <Compile Include="Converters\BoolToStringConverter.cs" />
     <Compile Include="Converters\IntToStringConverter.cs" />
     <Compile Include="Converters\UShortToString.cs" />
+    <Compile Include="Helper classes\RelayCommand.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Navigation\Navigation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\AnyPageModel.cs" />
+    <Compile Include="ViewModels\MenuModel.cs" />
     <Compile Include="ViewModels\PoolMenuModel.cs" />
+    <Compile Include="Views\AnyPage.xaml.cs">
+      <DependentUpon>AnyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Menu.xaml.cs">
+      <DependentUpon>Menu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PoolMenu.xaml.cs">
       <DependentUpon>PoolMenu.xaml</DependentUpon>
     </Compile>
@@ -165,6 +175,14 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AnyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Menu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PoolMenu.xaml">
       <SubType>Designer</SubType>
