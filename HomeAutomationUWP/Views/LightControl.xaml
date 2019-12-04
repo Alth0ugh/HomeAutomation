@@ -5,12 +5,11 @@
     xmlns:local="using:HomeAutomationUWP.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls ="using:HomeAutomationUWP.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel>
-        <RelativePanel>
-            
-        </RelativePanel>
-    </StackPanel>
+    <RelativePanel>
+        <controls:ColorTemperaturePicker RelativePanel.AlignBottomWithPanel="True" Temperature="{Binding ColorTemperature}"/>
+    </RelativePanel>
 </Page>
