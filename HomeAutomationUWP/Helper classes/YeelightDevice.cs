@@ -13,7 +13,7 @@ namespace HomeAutomationUWP.Helper_classes
         private static IPEndPoint _remoteEndPoint = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1982);
         private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.116"), 1901);
 
-        public async static void FindDevices()
+        public async static Task<List<YeelightDeviceCharacteristic>> FindDevices()
         {
             var _udpclient = new UdpClient();
             List<YeelightDeviceCharacteristic> _foundDevices = new List<YeelightDeviceCharacteristic>();
@@ -30,20 +30,41 @@ namespace HomeAutomationUWP.Helper_classes
 
             while (_udpclient.Available > 0)
             {
-                _foundDevices.Add(await _udpclient.ReceiveAsync());
+                var buffer = (await _udpclient.ReceiveAsync()).Buffer;
+                string message = string.Empty;
+                foreach (var character in buffer)
+                {
+                    message += (char)character;
+                }
+                _foundDevices.Add(GetDeviceCharacteristic(message));
             }
+
+            return _foundDevices;
         }
 
-        private YeelightDeviceCharacteristic GetDeviceCharacteristic(string messageBody)
+        private static YeelightDeviceCharacteristic GetDeviceCharacteristic(string messageBody)
         {
-            var details = messageBody.Split(new string[] { "\r\n" }, StringSplitOptions.None);
-            var headers = messageBody.Split(new string[] { ": " }, 1, StringSplitOptions.None);
+            var details = messageBody.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            List<string> headers = new List<string>();
+            List<string> information = new List<string>();
+
+            for (int i = 2; i < details.Length; i++)
+            {
+                var line = details[i].Split(new char[] { ':' }, 2);
+                headers.Add(line[0]);
+                information.Add(line[1]);
+            }
+
+            if (headers.Count != information.Count)
+            {
+                return null;
+            }
 
             Dictionary<string, string> data = new Dictionary<string, string>();
 
-            for (int i = 0; i < 0; i = i + 2)
+            for (int i = 0; i < headers.Count; i++)
             {
-                data.Add(headers[i], headers[i + 1]);
+                data.Add(headers[i], information[i]);
             }
 
             var ipAll = data["Location"].Replace("yeelight://", "").Split(':');

@@ -10,6 +10,9 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <RelativePanel>
-        <controls:ColorTemperaturePicker RelativePanel.AlignBottomWithPanel="True" Temperature="{Binding ColorTemperature}"/>
+        <StackPanel RelativePanel.AlignTopWithPanel="True">
+            <Button Content="Search" Command="{Binding SearchCommand}"/>
+        </StackPanel>
+        <!--<controls:ColorTemperaturePicker RelativePanel.AlignBottomWithPanel="True" Temperature="{Binding ColorTemperature}"/>-->
     </RelativePanel>
 </Page>

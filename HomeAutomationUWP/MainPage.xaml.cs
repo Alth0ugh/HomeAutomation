@@ -25,7 +25,7 @@ namespace HomeAutomationUWP
         public MainPage()
         {
             this.InitializeComponent();
-            windowFrame.Content = System.Activator.CreateInstance(typeof(HomeAutomationUWP.Views.AnyPage));
+            windowFrame.Content = System.Activator.CreateInstance(typeof(HomeAutomationUWP.Views.LightControl));
         }
     }
 }
