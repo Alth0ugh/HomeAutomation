@@ -39,6 +39,20 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private bool _isSearching;
+        public bool IsSearching
+        {
+            get
+            {
+                return _isSearching;
+            }
+            set
+            {
+                _isSearching = value;
+                NotifyPropertyChanged("IsSearching");
+            }
+        }
+
         public LightControlModel()
         {
             SetCommands();
@@ -51,13 +65,15 @@ namespace HomeAutomationUWP.ViewModels
 
         private async void SearchForDevices(object obj)
         {
+            /*
             var devices = await YeelightDevice.FindDevices();
             foreach (var device in devices)
             {
                 Debug.WriteLine("Device: " + device.IpAddresss);
                 Debug.WriteLine("Port: " + device.Port);
                 Debug.WriteLine("");
-            }
+            }*/
+            IsSearching = IsSearching ? false : true;
         }
     }
 }
