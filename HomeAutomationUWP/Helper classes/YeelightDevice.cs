@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
@@ -13,6 +12,10 @@ namespace HomeAutomationUWP.Helper_classes
         private static IPEndPoint _remoteEndPoint = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1982);
         private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.116"), 1901);
 
+        /// <summary>
+        /// Finds all Yeelight devices on network.
+        /// </summary>
+        /// <returns>List of device characteristics.</returns>
         public async static Task<List<YeelightDeviceCharacteristic>> FindDevices()
         {
             var _udpclient = new UdpClient();
@@ -42,20 +45,25 @@ namespace HomeAutomationUWP.Helper_classes
             return _foundDevices;
         }
 
+        /// <summary>
+        /// Extracts all information needed to form YeelightDeviceCharacteristic.
+        /// </summary>
+        /// <param name="messageBody">Raw packet body.</param>
+        /// <returns>Characteristic of the device.</returns>
         private static YeelightDeviceCharacteristic GetDeviceCharacteristic(string messageBody)
         {
             var details = messageBody.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             List<string> headers = new List<string>();
             List<string> information = new List<string>();
 
-            for (int i = 2; i < details.Length; i++)
+            for (int i = 2; i < details.Length; i++)                                //First two lines are unimportant
             {
                 var line = details[i].Split(new char[] { ':' }, 2);
                 headers.Add(line[0]);
                 information.Add(line[1]);
             }
 
-            if (headers.Count != information.Count)
+            if (headers.Count != information.Count)                                 //Details must be in the same count as information
             {
                 return null;
             }
