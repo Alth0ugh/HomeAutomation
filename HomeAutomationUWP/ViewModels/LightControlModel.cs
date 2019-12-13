@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -39,6 +40,20 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private ICommand _openDeviceSelectorCommand;
+        public ICommand OpenDeviceSelectorCommand
+        {
+            get
+            {
+                return _openDeviceSelectorCommand;
+            }
+            set
+            {
+                _openDeviceSelectorCommand = value;
+                NotifyPropertyChanged("OpenDeviceSelector");
+            }
+        }
+
         private bool _isSearching;
         public bool IsSearching
         {
@@ -53,6 +68,38 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private ObservableCollection<YeelightDevice> _yeelightDevices;
+        public ObservableCollection<YeelightDevice> YeelightDevices
+        {
+            get
+            {
+                if (_yeelightDevices == null)
+                {
+                    _yeelightDevices = new ObservableCollection<YeelightDevice>();
+                }
+                return _yeelightDevices;
+            }
+            set
+            {
+                _yeelightDevices = value;
+                NotifyPropertyChanged("YeelightDevices");
+            }
+        }
+
+        private bool _isSearchOpen;
+        public bool IsSearchOpen
+        {
+            get
+            {
+                return _isSearchOpen;
+            }
+            set
+            {
+                _isSearchOpen = value;
+                NotifyPropertyChanged("IsSearchOpen");
+            }
+        }
+
         public LightControlModel()
         {
             SetCommands();
@@ -61,9 +108,10 @@ namespace HomeAutomationUWP.ViewModels
         private void SetCommands()
         {
             SearchCommand = new RelayCommand(SearchForDevices);
+            OpenDeviceSelectorCommand = new RelayCommand(OpenDeviceSelector);
         }
 
-        private async void SearchForDevices(object obj)
+        private async void OpenDeviceSelector(object obj)
         {
             /*
             var devices = await YeelightDevice.FindDevices();
@@ -73,6 +121,12 @@ namespace HomeAutomationUWP.ViewModels
                 Debug.WriteLine("Port: " + device.Port);
                 Debug.WriteLine("");
             }*/
+            IsSearching = IsSearching ? false : true;
+            IsSearchOpen = IsSearchOpen ? false : true;
+        }
+
+        private void SearchForDevices(object obj)
+        {
             IsSearching = IsSearching ? false : true;
         }
     }

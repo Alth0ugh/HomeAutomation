@@ -11,23 +11,34 @@
 
     <RelativePanel>
         <StackPanel RelativePanel.AlignRightWithPanel="True" Margin="10">
-            <Button x:Name="addDeviceButton" Content="Add device" Command="{Binding SearchCommand}" Width="100"/>
-            <Popup x:Name="popup" IsOpen="{Binding IsSearching}" Height="100" Width="{Binding ElementName=addDeviceButton, Path=Width}">
-                <Border Width="{Binding ElementName=popup, Path=Width}" Height="{Binding ElementName=popup, Path=Height}"  BorderThickness="1" BorderBrush="Black" Background="#faf2f2">
-                    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                        <ItemsControl>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Ip address:"/>
-                                        <TextBlock Text="{Binding IpAddress}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+            <Button x:Name="addDeviceButton" Content="Add device" Command="{Binding OpenDeviceSelectorCommand}" Width="200"/>
+            <Border Visibility="{Binding IsSearchOpen}" 
+                    Width="{Binding ElementName=popup, Path=Width}" 
+                    Height="{Binding ElementName=popup, Path=Height}" 
+                    BorderThickness="1" 
+                    BorderBrush="Black" 
+                    Background="#faf2f2">
+                <Popup x:Name="popup" IsOpen="{Binding IsSearchOpen}" Height="200" Width="500">
+                    <StackPanel Background="Yellow">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Refresh" Command="{Binding SearchCommand}"/>
+                                <ProgressRing IsActive="{Binding IsSearching}" Margin="10, 10, 10, 10"/>
+                            </StackPanel>
+                            <ListView ItemsSource="{Binding YeelightDevices}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Ip address:"/>
+                                            <TextBlock Text="{Binding IpAddress}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
                     </StackPanel>
-                </Border>
-            </Popup>
+                </Popup>
+            </Border>
         </StackPanel>
         <!--<controls:ColorTemperaturePicker RelativePanel.AlignBottomWithPanel="True" Temperature="{Binding ColorTemperature}"/>-->
     </RelativePanel>
