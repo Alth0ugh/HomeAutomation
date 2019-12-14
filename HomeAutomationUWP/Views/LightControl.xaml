@@ -16,8 +16,8 @@
     </Page.Resources>
 
     <RelativePanel>
-        <StackPanel RelativePanel.AlignRightWithPanel="True" Margin="10">
-            <Button x:Name="addDeviceButton" Content="Add device" Command="{Binding OpenDeviceSelectorCommand}" Width="200"/>
+        <Button x:Name="addDeviceButton" RelativePanel.AlignRightWithPanel="True" Margin="10, 10, 10, 0" Content="Add device" Command="{Binding OpenDeviceSelectorCommand}" Width="200"/>
+        <StackPanel RelativePanel.AlignLeftWith="addDeviceButton" RelativePanel.AlignRightWith="addDeviceButton" RelativePanel.Below="addDeviceButton" Margin="10, 0, 10, 10">
             <Popup x:Name="popup" IsOpen="{Binding IsSearchOpen}" Height="200" Width="{Binding ElementName=addDeviceButton, Path=Width}" IsLightDismissEnabled="True">
                 <Border Visibility="{Binding IsSearchOpen}" 
                             Width="{Binding ElementName=popup, Path=Width}" 
@@ -40,8 +40,8 @@
                                                 <TextBlock Text="{Binding IpAddress}"/>
                                             </StackPanel>
                                             <RelativePanel>
-                                                <ProgressRing IsActive="{Binding IsConnecting}" RelativePanel.AlignRightWith="connectButton"/>
-                                                <TextBlock Visibility="{Binding IsConnecting, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                <ProgressRing IsActive="{Binding DataContext.IsConnecting, ElementName=lightControl}" RelativePanel.RightOf="connectButton"/>
+                                                <!--<TextBlock Text="OK" RelativePanel.RightOf="connectButton" Visibility="{Binding DataContext.IsConnectingSuccessful, ElementName=lightControl, Converter={StaticResource BoolToVisibilityConverter}}"/>-->
                                                 <Button Content="Connect"
                                                         x:Name="connectButton"
                                                         Visibility="{Binding ConnectButtonVisibility}" 
@@ -56,6 +56,13 @@
                     </ScrollViewer>
                 </Border>
             </Popup>
+
+        </StackPanel>
+        <StackPanel RelativePanel.Below="addDeviceButton">
+            <TextBlock Text="Brightness:"/>
+            <Slider Minimum="1" Maximum="100" Margin="10" Value="{Binding Brightness}"/>
+            <TextBlock Text="Color temperature:"/>
+            <controls:ColorTemperaturePicker Margin="10" Temperature="{}"/>
         </StackPanel>
         <!--<controls:ColorTemperaturePicker RelativePanel.AlignBottomWithPanel="True" Temperature="{Binding ColorTemperature}"/>-->
     </RelativePanel>

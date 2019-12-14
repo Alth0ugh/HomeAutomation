@@ -17,7 +17,7 @@ namespace HomeAutomationUWP.Converters
                 return Visibility.Collapsed; ;
             }
 
-            if (bool.Parse(value.ToString()))
+            if (!bool.Parse(value.ToString()))
             {
                 return Visibility.Visible;
             }
@@ -35,7 +35,7 @@ namespace HomeAutomationUWP.Converters
                 return false;
             }
 
-            if ((Visibility)value == Visibility.Visible)
+            if ((Visibility)value != Visibility.Visible)
             {
                 return true;
             }

@@ -12,7 +12,7 @@
     d:DesignWidth="500">
 
     <RelativePanel>
-        <Image Source="/Assets/ColorTemperature.png" Stretch="Fill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignTopWithPanel="True"/>
+        <Image Source="/Assets/ColorTemperature.png" Stretch="Fill" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignTopWithPanel="True"/>
         <Slider 
             Minimum="1700" 
             Maximum="6500" 
