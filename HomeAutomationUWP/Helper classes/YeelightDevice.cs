@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Windows;
+using Windows.UI.Xaml;
 
 namespace HomeAutomationUWP.Helper_classes
 {
@@ -11,6 +13,20 @@ namespace HomeAutomationUWP.Helper_classes
     {
         private static IPEndPoint _remoteEndPoint = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1982);
         private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.116"), 1901);
+        private TcpClient _tcpClient = new TcpClient();
+
+        public bool Connected
+        {
+            get
+            {
+                return _tcpClient.Connected;
+            }
+        }
+
+        private YeelightDevice(YeelightDeviceCharacteristic deviceCharacteristic)
+        {
+            _tcpClient.ConnectAsync(deviceCharacteristic.IpAddress, deviceCharacteristic.Port);
+        }
 
         /// <summary>
         /// Finds all Yeelight devices on network.
@@ -43,6 +59,11 @@ namespace HomeAutomationUWP.Helper_classes
             }
 
             return _foundDevices;
+        }
+
+        public static Task<YeelightDevice> Connect(YeelightDeviceCharacteristic deviceCharacteristic)
+        {
+            return Task.FromResult(new YeelightDevice(deviceCharacteristic));
         }
 
         /// <summary>
@@ -90,15 +111,29 @@ namespace HomeAutomationUWP.Helper_classes
         }
     }
 
-    public class YeelightDeviceCharacteristic
+    public class YeelightDeviceCharacteristic : BindableBase
     {
-        public string IpAddresss { get; set; }
+        public string IpAddress { get; set; }
         public int Port { get; set; }
         public List<string> AvaliableMethods { get; set; }
-
+        private Visibility _connectButtonVisibility;
+        public Visibility ConnectButtonVisibility
+        {
+            get
+            {
+                return _connectButtonVisibility;
+            }
+            set
+            {
+                _connectButtonVisibility = value;
+                NotifyPropertyChanged("ConnectButtonVisibility");
+            }
+        }
+        
         public YeelightDeviceCharacteristic(string ipAddress, int port, List<string> availableMethods)
         {
-            IpAddresss = ipAddress;
+            ConnectButtonVisibility = Visibility.Collapsed;
+            IpAddress = ipAddress;
             Port = port;
             AvaliableMethods = availableMethods;
         }

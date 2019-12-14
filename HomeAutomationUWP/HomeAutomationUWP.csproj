@@ -125,6 +125,7 @@
     <Compile Include="Controls\TimeSelector.xaml.cs">
       <DependentUpon>TimeSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\StringToUShort.cs" />
     <Compile Include="Converters\UShortToUShortConverter.cs" />
     <Compile Include="Converters\BoolToOnOFfOpposite.cs" />

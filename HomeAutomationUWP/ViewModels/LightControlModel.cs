@@ -54,6 +54,20 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private ICommand _connectCommand;
+        public ICommand ConnectCommand
+        {
+            get
+            {
+                return _connectCommand;
+            }
+            set
+            {
+                _connectCommand = value;
+                NotifyPropertyChanged("ConnectCommand");
+            }
+        }
+
         private bool _isSearching;
         public bool IsSearching
         {
@@ -68,14 +82,14 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        private ObservableCollection<YeelightDevice> _yeelightDevices;
-        public ObservableCollection<YeelightDevice> YeelightDevices
+        private ObservableCollection<YeelightDeviceCharacteristic> _yeelightDevices = new ObservableCollection<YeelightDeviceCharacteristic>();
+        public ObservableCollection<YeelightDeviceCharacteristic> YeelightDevices
         {
             get
             {
                 if (_yeelightDevices == null)
                 {
-                    _yeelightDevices = new ObservableCollection<YeelightDevice>();
+                    _yeelightDevices = new ObservableCollection<YeelightDeviceCharacteristic>();
                 }
                 return _yeelightDevices;
             }
@@ -83,6 +97,25 @@ namespace HomeAutomationUWP.ViewModels
             {
                 _yeelightDevices = value;
                 NotifyPropertyChanged("YeelightDevices");
+            }
+        }
+
+        private YeelightDeviceCharacteristic _selectedItem;
+        public YeelightDeviceCharacteristic SelectedItem
+        {
+            get
+            {
+                return _selectedItem;
+            }
+            set
+            {
+                if (_selectedItem != null)
+                {
+                    _selectedItem.ConnectButtonVisibility = Windows.UI.Xaml.Visibility.Collapsed;
+                }
+                _selectedItem = value;
+                NotifyPropertyChanged("SelectedItem");
+                _selectedItem.ConnectButtonVisibility = Windows.UI.Xaml.Visibility.Visible;
             }
         }
 
@@ -100,6 +133,35 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private bool _isConnecting;
+        public bool IsConnecting
+        {
+            get
+            {
+                return _isConnecting;
+            }
+            set
+            {
+                _isConnecting = value;
+                NotifyPropertyChanged("IsConnecting");
+            }
+        }
+
+        private YeelightDevice _connectedDevice;
+        public YeelightDevice ConnectedDevice
+        {
+            get
+            {
+                return _connectedDevice;
+            }
+            set
+            {
+                _connectedDevice = value;
+                NotifyPropertyChanged("ConnectedDevice");
+            }
+        }
+
+
         public LightControlModel()
         {
             SetCommands();
@@ -109,20 +171,30 @@ namespace HomeAutomationUWP.ViewModels
         {
             SearchCommand = new RelayCommand(SearchForDevices);
             OpenDeviceSelectorCommand = new RelayCommand(OpenDeviceSelector);
+            ConnectCommand = new RelayCommand(ConnectToLight);
+        }
+
+        private async void ConnectToLight(object obj)
+        {
+            var deviceCharacteristic = obj as YeelightDeviceCharacteristic;
+            if (deviceCharacteristic == null)
+            {
+                return;
+            }
+
+            ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
         }
 
         private async void OpenDeviceSelector(object obj)
         {
-            /*
+            IsSearchOpen = true;
+            IsSearching = true;
             var devices = await YeelightDevice.FindDevices();
+            IsSearching = false;
             foreach (var device in devices)
             {
-                Debug.WriteLine("Device: " + device.IpAddresss);
-                Debug.WriteLine("Port: " + device.Port);
-                Debug.WriteLine("");
-            }*/
-            IsSearching = IsSearching ? false : true;
-            IsSearchOpen = IsSearchOpen ? false : true;
+                YeelightDevices.Add(device);
+            }
         }
 
         private void SearchForDevices(object obj)
