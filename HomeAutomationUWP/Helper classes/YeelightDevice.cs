@@ -61,11 +61,7 @@ namespace HomeAutomationUWP.Helper_classes
             return _foundDevices;
         }
 
-        public static Task<YeelightDevice> Connect(YeelightDeviceCharacteristic deviceCharacteristic)
-        {
-            return Task.FromResult(new YeelightDevice(deviceCharacteristic));
-        }
-
+        
         /// <summary>
         /// Extracts all information needed to form YeelightDeviceCharacteristic.
         /// </summary>
@@ -109,7 +105,15 @@ namespace HomeAutomationUWP.Helper_classes
 
             return new YeelightDeviceCharacteristic(ip, result, availableMethods);
         }
+
+        public static Task<YeelightDevice> Connect(YeelightDeviceCharacteristic deviceCharacteristic)
+        {
+            return Task.FromResult(new YeelightDevice(deviceCharacteristic));
+        }
+
     }
+
+
 
     public class YeelightDeviceCharacteristic : BindableBase
     {
