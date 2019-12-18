@@ -13,12 +13,26 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
-
 namespace HomeAutomationUWP.Controls
 {
     public sealed partial class ColorTemperaturePicker : UserControl
     {
+        public static readonly DependencyProperty TemperatureProperty = DependencyProperty.Register("Temperature", typeof(int), typeof(ColorTemperaturePicker), PropertyMetadata.Create(5000));
+        public int Temperature
+        {
+            get
+            {
+                return (int)GetValue(TemplateProperty);
+            }
+            set
+            {
+                if (value >= 1700 && value <= 6500)
+                {
+                    SetValue(TemperatureProperty, value);
+                }
+            }
+        }
+
         public ColorTemperaturePicker()
         {
             this.InitializeComponent();

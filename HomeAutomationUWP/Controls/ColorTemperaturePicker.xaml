@@ -7,11 +7,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     MinHeight="30"
+    MaxHeight="30"
     d:DesignHeight="30"
     d:DesignWidth="500">
 
     <RelativePanel>
         <Image Source="/Assets/ColorTemperature.png" Stretch="Fill" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignTopWithPanel="True"/>
-        <Slider RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignTopWithPanel="True"/>
+        <Slider 
+            Minimum="1700" 
+            Maximum="6500" 
+            RelativePanel.AlignLeftWithPanel="True"
+            RelativePanel.AlignRightWithPanel="True"
+            RelativePanel.AlignBottomWithPanel="True"
+            RelativePanel.AlignTopWithPanel="True"
+            Value="{Binding Temperature}"/>
     </RelativePanel>
 </UserControl>
