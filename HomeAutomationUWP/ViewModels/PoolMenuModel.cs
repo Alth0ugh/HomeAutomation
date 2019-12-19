@@ -7,13 +7,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using HomeAutomationUWP.Controls;
 using Windows.UI.Xaml;
-using HomeAutomationUWP.Helper_classes;
-using System.Runtime.Serialization.Json;
-using System.IO;
-using System.Threading;
 
 namespace HomeAutomationUWP.ViewModels
 {
@@ -34,6 +29,7 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        //public static DependencyProperty ListOfTimeSelectorsDependencyProperty = DependencyProperty.Register("ListOfTimeSelectors", typeof(ObservableCollection<TimeSelectorCharacteristic>), typeof(PoolMenuModel), new PropertyMetadata(new ObservableCollection<TimeSelectorCharacteristic>()));
         private ObservableCollection<TimeSelectorCharacteristic> _listOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>();
         public ObservableCollection<TimeSelectorCharacteristic> ListOfTimeSelectors
         {
@@ -63,55 +59,15 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        public ICommand OnOffCommand { get; set; }
-        public ICommand AddTimeCommand { get; set; }
-        public ICommand SerializeCommand { get; set; }
-
         public PoolMenuModel()
         {
             PoolPower = false;
+            //ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>();
 
-            SetCommands();
+            ListOfTimeSelectors.Add(new TimeSelectorCharacteristic { FromTime = 5, ToTime = 6 });
+            //ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { From = 1, To = 5});
         }
 
-        private void SetCommands()
-        {
-            OnOffCommand = new RelayCommand(SetESPStatus);
-            AddTimeCommand = new RelayCommand(AddTimeEntry);
-            SerializeCommand = new RelayCommand(Serialize);
-        }
-
-        private void Serialize(object obj)
-        {
-            var serializer = new DataContractJsonSerializer(typeof(ObservableCollection<TimeSelectorCharacteristic>));
-            var memoryStream = new MemoryStream();
-            serializer.WriteObject(memoryStream, ListOfTimeSelectors);
-            memoryStream.Position = 0;
-            var reader = new StreamReader(memoryStream);
-            Debug.WriteLine(reader.ReadToEnd());
-            /*Task.Run(() =>
-            {
-                var fileStream = new FileStream((Windows.ApplicationModel.Package.Current.InstalledLocation)., FileMode.Create);
-                memoryStream.WriteTo(fileStream);
-            });*/
-        }
-
-        private void AddTimeEntry(object obj)
-        {
-            ListOfTimeSelectors.Add(new TimeSelectorCharacteristic());
-        }
-
-        private void SetESPStatus(object obj)
-        {
-            if (PoolPower)
-            {
-                PoolPower = false;
-            }
-            else
-            {
-                PoolPower = true;
-            }
-        }
 
         // This method is called by the Set accessor of each property.
         // The CallerMemberName attribute that is applied to the optional propertyName

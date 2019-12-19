@@ -32,12 +32,8 @@
 
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
             <TextBlock Text="{Binding PoolPower, Converter={StaticResource BoolToString}, Mode=OneWay}" VerticalAlignment="Center"/>
-            <Button Content="{Binding PoolPower, Converter={StaticResource BoolToOnOffOpposite}, Mode=OneWay}" Command="{Binding OnOffCommand}"/>
-        </StackPanel>
+            <Button Content="{Binding PoolPower, Converter={StaticResource BoolToOnOffOpposite}, Mode=OneWay}"/>
 
-        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Content="+" Command="{Binding AddTimeCommand}"/>
-            <Button Content="Serialize" Margin="10" Command="{Binding SerializeCommand}"/>
         </StackPanel>
 
         <ScrollViewer Grid.Column="0" Grid.Row="1">

@@ -16,8 +16,6 @@ using System.Windows;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
-using System.Runtime.Serialization.Json;
-using System.Runtime.Serialization;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -137,10 +135,9 @@ namespace HomeAutomationUWP.Controls
         }
     }
 
-    [DataContract]
     public class TimeSelectorCharacteristic : INotifyPropertyChanged
     {
-        [DataMember]
+        private ushort _fromTime;
         public ushort FromTime
         {
             get
@@ -153,21 +150,7 @@ namespace HomeAutomationUWP.Controls
                 NotifyPropertyChanged("FromTime");
             }
         }
-        private ushort _fromTime = 0;
-        [DataMember]
-        public ushort ToTime
-        {
-            get
-            {
-                return _toTime;
-            }
-            set
-            {
-                _toTime = value;
-                NotifyPropertyChanged("ToTime");
-            }
-        }
-        private ushort _toTime = 1;
+        public ushort ToTime { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
