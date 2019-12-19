@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -17,12 +21,20 @@ namespace HomeAutomationUWP.Controls
 {
     public sealed partial class ColorTemperaturePicker : UserControl
     {
-        public static readonly DependencyProperty TemperatureProperty = DependencyProperty.Register("Temperature", typeof(int), typeof(ColorTemperaturePicker), PropertyMetadata.Create(5000));
-        public int Temperature
+        public static readonly DependencyProperty TemperatureProperty = DependencyProperty.Register(nameof(Temperature), typeof(double), typeof(ColorTemperaturePicker), PropertyMetadata.Create((double)6000));
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public double Temperature
         {
             get
             {
-                return (int)GetValue(TemplateProperty);
+                return (double)GetValue(TemplateProperty);
             }
             set
             {
@@ -36,6 +48,7 @@ namespace HomeAutomationUWP.Controls
         public ColorTemperaturePicker()
         {
             this.InitializeComponent();
+            layout.DataContext = this;
         }
     }
 }

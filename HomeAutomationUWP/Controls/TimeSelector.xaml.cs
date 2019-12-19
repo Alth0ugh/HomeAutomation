@@ -54,7 +54,7 @@ namespace HomeAutomationUWP.Controls
                 {
                     SetValue(FromProperty, value);
                     Debug.Write(value);
-                    FromText.Text = GetValue(FromProperty).ToString();
+                    //FromText.Text = GetValue(FromProperty).ToString();
                 }
                 else
                 {
