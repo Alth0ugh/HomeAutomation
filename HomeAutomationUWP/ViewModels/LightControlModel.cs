@@ -21,7 +21,13 @@ namespace HomeAutomationUWP.ViewModels
             }
             set
             {
-                _colorTemperature = value;
+                if (Math.Floor(value / 500) * 500 == _colorTemperature)
+                {
+                    return;
+                }
+
+                _colorTemperature = Math.Floor(value / 500) * 500;
+                ConnectedDevice?.SetColorTemperature((int)_colorTemperature);
                 NotifyPropertyChanged("ColorTemperature");
             }
         }
@@ -35,8 +41,21 @@ namespace HomeAutomationUWP.ViewModels
             }
             set
             {
-                _brightness = value;
-                ConnectedDevice.SetBrightness((int)_brightness);
+                if (Math.Floor(value / 10) * 10 == _brightness && value != 0)
+                {
+                    return;
+                }
+                else if (value == 0)
+                {
+                    ConnectedDevice?.SetPower(false);
+                }
+
+                if (value != 0 && _brightness == 0)
+                {
+                    ConnectedDevice?.SetPower(true);
+                }
+                _brightness = Math.Floor(value / 10) * 10;
+                ConnectedDevice?.SetBrightness((int)_brightness);
                 NotifyPropertyChanged("Brightness");
             }
         }
@@ -213,7 +232,10 @@ namespace HomeAutomationUWP.ViewModels
 
             ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
             ConnectedDevice.SetPower(true);
-
+            _brightness = deviceCharacteristic.Brightness;
+            NotifyPropertyChanged("Brightness");
+            _colorTemperature = deviceCharacteristic.ColorTemperature;
+            NotifyPropertyChanged("ColorTemperature");
             //ConnectingState = ConnectedDevice.Connected ? (ushort)1 : (ushort)2;
         }
 
