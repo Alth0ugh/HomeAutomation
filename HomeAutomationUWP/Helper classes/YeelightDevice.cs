@@ -28,7 +28,7 @@ namespace HomeAutomationUWP.Helper_classes
         {
             get
             {
-                return _tcpClient.Connected;
+                return _tcpClient.Client.Connected;
             }
         }
 
@@ -128,11 +128,21 @@ namespace HomeAutomationUWP.Helper_classes
             return deviceCharacteristic;
         }
 
+        /// <summary>
+        /// Connects to Yeelight device.
+        /// </summary>
+        /// <param name="deviceCharacteristic">Device characteristic of device to connect to.</param>
+        /// <returns></returns>
         public static Task<YeelightDevice> Connect(YeelightDeviceCharacteristic deviceCharacteristic)
         {
             return Task.FromResult(new YeelightDevice(deviceCharacteristic));
         }
 
+        /// <summary>
+        /// Sets color temperature of device.
+        /// </summary>
+        /// <param name="value">Value from 1700 to 6500.</param>
+        /// <returns></returns>
         public bool SetColorTemperature(int value)
         {
             if (!DeviceCharacteristic.AvaliableMethods.Contains("set_ct_abx"))
@@ -143,6 +153,11 @@ namespace HomeAutomationUWP.Helper_classes
             return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
         }
 
+        /// <summary>
+        /// Sets brightness of a device.
+        /// </summary>
+        /// <param name="value">Value from 1 to 100.</param>
+        /// <returns></returns>
         public bool SetBrightness(int value)
         {
             if (!DeviceCharacteristic.AvaliableMethods.Contains("set_bright"))
@@ -153,6 +168,11 @@ namespace HomeAutomationUWP.Helper_classes
             return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_bright", value, "sudden", 0));
         }
 
+        /// <summary>
+        /// Sets power of a device.
+        /// </summary>
+        /// <param name="value">True to power on, false to power off.</param>
+        /// <returns></returns>
         public bool SetPower(bool value)
         {
             if (!DeviceCharacteristic.AvaliableMethods.Contains("set_power"))
@@ -170,6 +190,11 @@ namespace HomeAutomationUWP.Helper_classes
             }
         }
 
+        /// <summary>
+        /// Sends command to a device.
+        /// </summary>
+        /// <param name="yeelightCommand">Instance of Yeelight command.</param>
+        /// <returns></returns>
         private bool SendCommand(YeelightCommand yeelightCommand)
         {
             var networkStream = new NetworkStream(_tcpClient.Client);

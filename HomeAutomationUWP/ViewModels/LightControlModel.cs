@@ -41,19 +41,27 @@ namespace HomeAutomationUWP.ViewModels
             }
             set
             {
-                if (Math.Floor(value / 10) * 10 == _brightness && value != 0)
+                if (value != 0 && _brightness == 0)
+                {
+                    ConnectedDevice?.SetPower(true);
+                }
+
+                if (value == 1)
+                {
+                    ConnectedDevice?.SetBrightness(1);
+                    return;
+                }
+                else if (Math.Floor(value / 10) * 10 == _brightness && value != 0)
                 {
                     return;
                 }
                 else if (value == 0)
                 {
                     ConnectedDevice?.SetPower(false);
+                    ConnectedDevice?.SetBrightness(1);
                 }
 
-                if (value != 0 && _brightness == 0)
-                {
-                    ConnectedDevice?.SetPower(true);
-                }
+                
                 _brightness = Math.Floor(value / 10) * 10;
                 ConnectedDevice?.SetBrightness((int)_brightness);
                 NotifyPropertyChanged("Brightness");
