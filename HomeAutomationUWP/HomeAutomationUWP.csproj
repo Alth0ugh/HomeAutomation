@@ -133,7 +133,6 @@
     <Compile Include="Converters\IntToStringConverter.cs" />
     <Compile Include="Converters\UShortToString.cs" />
     <Compile Include="Helper classes\BindableBase.cs" />
-    <Compile Include="Helper classes\ESP8266Connection.cs" />
     <Compile Include="Helper classes\RelayCommand.cs" />
     <Compile Include="Helper classes\YeelightDevice.cs" />
     <Compile Include="MainPage.xaml.cs">

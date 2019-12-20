@@ -137,56 +137,64 @@ namespace HomeAutomationUWP.Helper_classes
         {
             return Task.FromResult(new YeelightDevice(deviceCharacteristic));
         }
-
+        
         /// <summary>
         /// Sets color temperature of device.
         /// </summary>
-        /// <param name="value">Value from 1700 to 6500.</param>
-        /// <returns></returns>
-        public bool SetColorTemperature(int value)
+        /// <param name="value">Value from 2700 to 6500.</param>
+        public void SetColorTemperature(int value)
         {
             if (!DeviceCharacteristic.AvaliableMethods.Contains("set_ct_abx"))
             {
-                return false;
+                return;
             }
+            SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
 
-            return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
+            Task.Delay(1000);
+            
+            var networkStream = new NetworkStream(_tcpClient.Client);
+            Debug.Write((char)networkStream.ReadByte());
+            while (_tcpClient.Client.Available > 0)
+            {
+                Debug.Write((char)networkStream.ReadByte());
+            }
+            Debug.WriteLine("");
+            return;
+            //return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
         }
 
         /// <summary>
         /// Sets brightness of a device.
         /// </summary>
         /// <param name="value">Value from 1 to 100.</param>
-        /// <returns></returns>
-        public bool SetBrightness(int value)
+        public void SetBrightness(int value)
         {
             if (!DeviceCharacteristic.AvaliableMethods.Contains("set_bright"))
             {
-                return false;
+                return;
             }
 
-            return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_bright", value, "sudden", 0));
+            SendCommand(new YeelightCommand(_random.Next(1, 100), "set_bright", value, "sudden", 0));
         }
 
         /// <summary>
         /// Sets power of a device.
         /// </summary>
         /// <param name="value">True to power on, false to power off.</param>
-        /// <returns></returns>
-        public bool SetPower(bool value)
+        public void SetPower(bool value)
         {
             if (!DeviceCharacteristic.AvaliableMethods.Contains("set_power"))
             {
-                return false;
+                return;
             }
 
             if (value)
             {
-                return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "on", "smooth", 500));
+                SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "on", "smooth", 500));
             }
             else
             {
-                return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "off", "smooth", 500));
+                SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "off", "smooth", 500));
             }
         }
 
@@ -194,8 +202,7 @@ namespace HomeAutomationUWP.Helper_classes
         /// Sends command to a device.
         /// </summary>
         /// <param name="yeelightCommand">Instance of Yeelight command.</param>
-        /// <returns></returns>
-        private bool SendCommand(YeelightCommand yeelightCommand)
+        private void SendCommand(YeelightCommand yeelightCommand)
         {
             var networkStream = new NetworkStream(_tcpClient.Client);
             var ms = new MemoryStream();
@@ -207,11 +214,11 @@ namespace HomeAutomationUWP.Helper_classes
             try
             {
                 ns.Write(Encoding.ASCII.GetBytes(a), 0, a.Length);
-                return true;
+                return;
             }
             catch
             {
-                return false;
+                return;
             }
         }
     }

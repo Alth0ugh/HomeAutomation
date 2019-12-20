@@ -12,7 +12,7 @@ namespace HomeAutomationUWP.ViewModels
 {
     public class LightControlModel : BindableBase
     {
-        private double _colorTemperature = 1700;
+        private double _colorTemperature = 2700;
         public double ColorTemperature
         {
             get

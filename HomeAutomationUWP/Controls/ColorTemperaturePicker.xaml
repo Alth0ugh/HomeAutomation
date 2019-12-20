@@ -16,7 +16,7 @@
         <Image Source="/Assets/ColorTemperature.png" Stretch="Fill" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignTopWithPanel="True"/>
         <Slider 
             x:Name="slider"
-            Minimum="1700" 
+            Minimum="2700" 
             Maximum="6500" 
             RelativePanel.AlignLeftWithPanel="True"
             RelativePanel.AlignRightWithPanel="True"
