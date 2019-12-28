@@ -8,8 +8,8 @@
     xmlns:controls ="using:HomeAutomationUWP.Controls"
     xmlns:converters="using:HomeAutomationUWP.Converters"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    x:Name="lightControl">
+    x:Name="lightControl"
+    Background="White">
 
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Name="BoolToVisibilityConverter"/>

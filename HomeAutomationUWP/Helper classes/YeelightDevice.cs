@@ -11,6 +11,7 @@ using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
 using System.IO;
 using System.Diagnostics;
+using Windows.UI.Xaml.Input;
 
 namespace HomeAutomationUWP.Helper_classes
 {
@@ -247,10 +248,12 @@ namespace HomeAutomationUWP.Helper_classes
         }
     }   
 
-
+    [DataContract]
     public class YeelightDeviceCharacteristic : BindableBase
     {
+        [DataMember]
         public string IpAddress { get; }
+        [DataMember]
         public int Port { get; }
         public List<string> AvaliableMethods { get; }
         private Visibility _connectButtonVisibility;
