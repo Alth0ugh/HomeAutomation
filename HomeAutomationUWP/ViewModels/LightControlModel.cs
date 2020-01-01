@@ -12,8 +12,8 @@ namespace HomeAutomationUWP.ViewModels
 {
     public class LightControlModel : BindableBase
     {
-        private int _colorTemperature = 1700;
-        public int ColorTemperature
+        private double _colorTemperature = 2700;
+        public double ColorTemperature
         {
             get
             {
@@ -21,8 +21,50 @@ namespace HomeAutomationUWP.ViewModels
             }
             set
             {
-                _colorTemperature = value;
+                if (Math.Floor(value / 500) * 500 == _colorTemperature)
+                {
+                    return;
+                }
+
+                _colorTemperature = Math.Floor(value / 500) * 500;
+                ConnectedDevice?.SetColorTemperature((int)_colorTemperature);
                 NotifyPropertyChanged("ColorTemperature");
+            }
+        }
+
+        private double _brightness = 0;
+        public double Brightness
+        {
+            get
+            {
+                return _brightness;
+            }
+            set
+            {
+                if (value != 0 && _brightness == 0)
+                {
+                    ConnectedDevice?.SetPower(true);
+                }
+
+                if (value == 1)
+                {
+                    ConnectedDevice?.SetBrightness(1);
+                    return;
+                }
+                else if (Math.Floor(value / 10) * 10 == _brightness && value != 0)
+                {
+                    return;
+                }
+                else if (value == 0)
+                {
+                    ConnectedDevice?.SetPower(false);
+                    ConnectedDevice?.SetBrightness(1);
+                }
+
+                
+                _brightness = Math.Floor(value / 10) * 10;
+                ConnectedDevice?.SetBrightness((int)_brightness);
+                NotifyPropertyChanged("Brightness");
             }
         }
 
@@ -175,20 +217,7 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        private uint _brightness = 0;
-        public uint Brightness
-        {
-            get
-            {
-                return _brightness;
-            }
-            set
-            {
-                _brightness = value;
-                NotifyPropertyChanged("Brightness");
-            }
-        }
-
+        
         public LightControlModel()
         {
             SetCommands();
@@ -210,6 +239,11 @@ namespace HomeAutomationUWP.ViewModels
             }
 
             ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
+            ConnectedDevice.SetPower(true);
+            _brightness = deviceCharacteristic.Brightness;
+            NotifyPropertyChanged("Brightness");
+            _colorTemperature = deviceCharacteristic.ColorTemperature;
+            NotifyPropertyChanged("ColorTemperature");
             //ConnectingState = ConnectedDevice.Connected ? (ushort)1 : (ushort)2;
         }
 

@@ -6,6 +6,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Windows;
 using Windows.UI.Xaml;
+using Windows.Data.Json;
+using System.Runtime.Serialization.Json;
+using System.Runtime.Serialization;
+using System.IO;
+using System.Diagnostics;
+using Windows.UI.Xaml.Input;
 
 namespace HomeAutomationUWP.Helper_classes
 {
@@ -14,18 +20,23 @@ namespace HomeAutomationUWP.Helper_classes
         private static IPEndPoint _remoteEndPoint = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1982);
         private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.116"), 1901);
         private TcpClient _tcpClient = new TcpClient();
+        private Random _random = new Random();
+        private DataContractJsonSerializer _serializer = new DataContractJsonSerializer(typeof(YeelightCommand));
+
+        public YeelightDeviceCharacteristic DeviceCharacteristic { get; }
 
         public bool Connected
         {
             get
             {
-                return _tcpClient.Connected;
+                return _tcpClient.Client.Connected;
             }
         }
 
         private YeelightDevice(YeelightDeviceCharacteristic deviceCharacteristic)
         {
-            _tcpClient.ConnectAsync(deviceCharacteristic.IpAddress, deviceCharacteristic.Port);
+            DeviceCharacteristic = deviceCharacteristic;
+            _tcpClient.Client.Connect(deviceCharacteristic.IpAddress, deviceCharacteristic.Port);
         }
 
         /// <summary>
@@ -61,7 +72,6 @@ namespace HomeAutomationUWP.Helper_classes
             return _foundDevices;
         }
 
-        
         /// <summary>
         /// Extracts all information needed to form YeelightDeviceCharacteristic.
         /// </summary>
@@ -76,6 +86,10 @@ namespace HomeAutomationUWP.Helper_classes
             for (int i = 2; i < details.Length; i++)                                //First two lines are unimportant
             {
                 var line = details[i].Split(new char[] { ':' }, 2);
+                if (line[0] != "support")
+                {
+                    line[1] = line[1].Trim();                                       //After ':' is whitespace
+                }
                 headers.Add(line[0]);
                 information.Add(line[1]);
             }
@@ -103,23 +117,145 @@ namespace HomeAutomationUWP.Helper_classes
 
             List<string> availableMethods = new List<string>(data["support"].Split(' '));
 
-            return new YeelightDeviceCharacteristic(ip, result, availableMethods);
+            parsing = int.TryParse(data["bright"], out int brightness);
+            if (!parsing)
+            {
+                return null;
+            }
+            parsing = int.TryParse(data["ct"], out int colorTemperature);
+
+            var deviceCharacteristic = new YeelightDeviceCharacteristic(ip, result, availableMethods) { Power = data["power"].Trim(), Brightness = brightness, ColorTemperature = colorTemperature};
+
+            return deviceCharacteristic;
         }
 
+        /// <summary>
+        /// Connects to Yeelight device.
+        /// </summary>
+        /// <param name="deviceCharacteristic">Device characteristic of device to connect to.</param>
+        /// <returns></returns>
         public static Task<YeelightDevice> Connect(YeelightDeviceCharacteristic deviceCharacteristic)
         {
             return Task.FromResult(new YeelightDevice(deviceCharacteristic));
         }
+        
+        /// <summary>
+        /// Sets color temperature of device.
+        /// </summary>
+        /// <param name="value">Value from 2700 to 6500.</param>
+        public void SetColorTemperature(int value)
+        {
+            if (!DeviceCharacteristic.AvaliableMethods.Contains("set_ct_abx"))
+            {
+                return;
+            }
+            SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
 
+            Task.Delay(1000);
+            
+            var networkStream = new NetworkStream(_tcpClient.Client);
+            Debug.Write((char)networkStream.ReadByte());
+            while (_tcpClient.Client.Available > 0)
+            {
+                Debug.Write((char)networkStream.ReadByte());
+            }
+            Debug.WriteLine("");
+            return;
+            //return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
+        }
+
+        /// <summary>
+        /// Sets brightness of a device.
+        /// </summary>
+        /// <param name="value">Value from 1 to 100.</param>
+        public void SetBrightness(int value)
+        {
+            if (!DeviceCharacteristic.AvaliableMethods.Contains("set_bright"))
+            {
+                return;
+            }
+
+            SendCommand(new YeelightCommand(_random.Next(1, 100), "set_bright", value, "sudden", 0));
+        }
+
+        /// <summary>
+        /// Sets power of a device.
+        /// </summary>
+        /// <param name="value">True to power on, false to power off.</param>
+        public void SetPower(bool value)
+        {
+            if (!DeviceCharacteristic.AvaliableMethods.Contains("set_power"))
+            {
+                return;
+            }
+
+            if (value)
+            {
+                SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "on", "smooth", 500));
+            }
+            else
+            {
+                SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "off", "smooth", 500));
+            }
+        }
+
+        /// <summary>
+        /// Sends command to a device.
+        /// </summary>
+        /// <param name="yeelightCommand">Instance of Yeelight command.</param>
+        private void SendCommand(YeelightCommand yeelightCommand)
+        {
+            var networkStream = new NetworkStream(_tcpClient.Client);
+            var ms = new MemoryStream();
+            _serializer.WriteObject(ms, yeelightCommand);
+            ms.Position = 0;
+            var sr = new StreamReader(ms);
+            var a = sr.ReadLine() + "\r\n";
+            var ns = new NetworkStream(_tcpClient.Client);
+            try
+            {
+                ns.Write(Encoding.ASCII.GetBytes(a), 0, a.Length);
+                return;
+            }
+            catch
+            {
+                return;
+            }
+        }
     }
 
+    [DataContract]
+    public class YeelightCommand
+    {
+        [DataMember]
+        public List<object> @params { get; set; }
+        
+        [DataMember]
+        public string method { get; set; }
 
+        [DataMember]
+        public int id { get; set; }
 
+        public YeelightCommand(int identificator, string methodName, params object[] parameters)
+        {
+            id = identificator;
+            method = methodName;
+            @params = new List<object>();
+            foreach (var parameter in parameters)
+            {
+                @params.Add(parameter);
+            }
+        }
+    }   
+
+    [DataContract]
     public class YeelightDeviceCharacteristic : BindableBase
     {
-        public string IpAddress { get; set; }
-        public int Port { get; set; }
-        public List<string> AvaliableMethods { get; set; }
+        [DataMember]
+        public string IpAddress { get; }
+        [DataMember]
+        public int Port { get; }
+        public List<string> AvaliableMethods { get; }
         private Visibility _connectButtonVisibility;
         public Visibility ConnectButtonVisibility
         {
@@ -133,7 +269,10 @@ namespace HomeAutomationUWP.Helper_classes
                 NotifyPropertyChanged("ConnectButtonVisibility");
             }
         }
-        
+        public string Power { get; set; }
+        public int Brightness { get; set; }
+        public int ColorTemperature { get; set; }
+
         public YeelightDeviceCharacteristic(string ipAddress, int port, List<string> availableMethods)
         {
             ConnectButtonVisibility = Visibility.Collapsed;

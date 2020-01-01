@@ -8,8 +8,8 @@
     xmlns:controls ="using:HomeAutomationUWP.Controls"
     xmlns:converters="using:HomeAutomationUWP.Converters"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    x:Name="lightControl">
+    x:Name="lightControl"
+    Background="White">
 
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Name="BoolToVisibilityConverter"/>
@@ -60,10 +60,9 @@
         </StackPanel>
         <StackPanel RelativePanel.Below="addDeviceButton">
             <TextBlock Text="Brightness:"/>
-            <Slider Minimum="1" Maximum="100" Margin="10" Value="{Binding Brightness}"/>
+            <Slider Minimum="0" Maximum="100" Margin="10" Value="{Binding Brightness, Mode=TwoWay}"/>
             <TextBlock Text="Color temperature:"/>
-            <controls:ColorTemperaturePicker Margin="10" Temperature="{}"/>
+            <controls:ColorTemperaturePicker Margin="10" Temperature="{Binding ColorTemperature, Mode=TwoWay}"/>
         </StackPanel>
-        <!--<controls:ColorTemperaturePicker RelativePanel.AlignBottomWithPanel="True" Temperature="{Binding ColorTemperature}"/>-->
     </RelativePanel>
 </Page>
