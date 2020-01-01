@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using HomeAutomationUWP.Views;
 
 namespace HomeAutomationUWP
 {
@@ -66,10 +67,11 @@ namespace HomeAutomationUWP
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    rootFrame.Navigate(typeof(LightControl), e.Arguments);
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
+                Navigation.Navigation.Frame = rootFrame;
             }
         }
 
