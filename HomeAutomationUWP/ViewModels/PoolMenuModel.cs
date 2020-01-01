@@ -87,6 +87,10 @@ namespace HomeAutomationUWP.ViewModels
             SerializeCommand = new RelayCommand(Serialize);
         }
 
+        /// <summary>
+        /// Serializes the time intervals and saves the data int a file.
+        /// </summary>
+        /// <param name="obj"></param>
         private async void Serialize(object obj)
         {
             ConvertIntervals();
@@ -107,6 +111,10 @@ namespace HomeAutomationUWP.ViewModels
             });*/
         }
 
+        /// <summary>
+        /// Sorts intervals.
+        /// </summary>
+        /// <returns>Sorted list.</returns>
         private ObservableCollection<TimeSelectorCharacteristic> SortIntervals()
         {
             List<TimeSelectorCharacteristic> sorted = ListOfTimeSelectors.OrderBy(o => o.FromTime).ToList();
@@ -119,6 +127,9 @@ namespace HomeAutomationUWP.ViewModels
             return newArray;
         }
 
+        /// <summary>
+        /// Merges overlapping intervals.
+        /// </summary>
         private void ConvertIntervals()
         {
             var oldArray = SortIntervals();
@@ -173,6 +184,10 @@ namespace HomeAutomationUWP.ViewModels
             ListOfTimeSelectors = newArray;
         }
 
+        /// <summary>
+        /// Adds an interval to collection.
+        /// </summary>
+        /// <param name="obj"></param>
         private void AddTimeEntry(object obj)
         {
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic());
