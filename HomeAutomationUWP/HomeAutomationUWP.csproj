@@ -125,13 +125,16 @@
     <Compile Include="Controls\TimeSelector.xaml.cs">
       <DependentUpon>TimeSelector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\StringToUShort.cs" />
     <Compile Include="Converters\UShortToUShortConverter.cs" />
     <Compile Include="Converters\BoolToOnOFfOpposite.cs" />
     <Compile Include="Converters\BoolToStringConverter.cs" />
     <Compile Include="Converters\IntToStringConverter.cs" />
     <Compile Include="Converters\UShortToString.cs" />
+    <Compile Include="Helper classes\BindableBase.cs" />
     <Compile Include="Helper classes\RelayCommand.cs" />
+    <Compile Include="Helper classes\YeelightDevice.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

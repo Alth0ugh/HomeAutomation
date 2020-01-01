@@ -15,7 +15,6 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Threading;
 using Windows.Storage.Streams;
-using Windows.Storage.Pickers;
 
 namespace HomeAutomationUWP.ViewModels
 {

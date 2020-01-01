@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using HomeAutomationUWP.ViewModels;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -24,6 +25,7 @@ namespace HomeAutomationUWP.Views
     {
         public LightControl()
         {
+            DataContext = new LightControlModel();
             this.InitializeComponent();
         }
     }
