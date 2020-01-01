@@ -11,6 +11,9 @@ namespace HomeAutomationUWP.Navigation
     {
         public static Frame Frame { get; set; }
 
+        /// <summary>
+        /// Navigates to previous page.
+        /// </summary>
         public static void GoBack()
         {
             if (Frame.CanGoBack)
@@ -19,6 +22,10 @@ namespace HomeAutomationUWP.Navigation
             }
         }
 
+        /// <summary>
+        /// Navigates to a given page.
+        /// </summary>
+        /// <param name="page">Page to navigate.</param>
         public static void Navigate(Type page)
         {
             Frame?.Navigate(page);

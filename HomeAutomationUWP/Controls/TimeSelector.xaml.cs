@@ -84,6 +84,11 @@ namespace HomeAutomationUWP.Controls
             }
         }
 
+        /// <summary>
+        /// Changes value in textblocks.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void ChangeTime(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
