@@ -9,6 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button Content="Pool" Height="100" Width="100" Command="{Binding Pool}"/>
+        <Button Content="Pool" Height="100" Width="100" Command="{Binding Pool}" Margin="10"/>
+        <Button Content="Light" Height="100" Width="100" Command="{Binding Ligh}" Margin="10"/>
     </StackPanel>
 </Page>
