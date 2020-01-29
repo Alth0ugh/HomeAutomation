@@ -9,7 +9,11 @@ namespace HomeAutomationUWP.Navigation
 {
     public static class Navigation
     {
-        public static Frame Frame { get; set; }
+        public static Frame Frame
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Navigates to previous page.

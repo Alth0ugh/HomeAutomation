@@ -7,6 +7,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    
-    <Frame x:Name="frame"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Button Content="Back" Grid.Row="0" Command="{Binding BackButton}" Margin="10"/>
+        <Frame x:Name="frame" Grid.Row="1"/>
+    </Grid>
 </Page>
