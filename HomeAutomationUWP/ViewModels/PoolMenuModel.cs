@@ -11,6 +11,7 @@ using System.Windows.Input;
 using HomeAutomationUWP.Controls;
 using Windows.UI.Xaml;
 using HomeAutomationUWP.Helper_classes;
+using HomeAutomationUWP.Helper_interfaces;
 using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Threading;
@@ -18,7 +19,7 @@ using Windows.Storage.Streams;
 
 namespace HomeAutomationUWP.ViewModels
 {
-    public class PoolMenuModel : INotifyPropertyChanged
+    public class PoolMenuModel : INotifyPropertyChanged, INavigateBackAction
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private bool _poolPower;
@@ -210,6 +211,13 @@ namespace HomeAutomationUWP.ViewModels
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void OnNavigateBackAction(object obj)
+        {
+            Debug.WriteLine("serializing");
+            return;
+            Serialize(null);
         }
     }
 }
