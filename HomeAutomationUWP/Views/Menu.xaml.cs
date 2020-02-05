@@ -13,6 +13,7 @@ namespace HomeAutomationUWP.Views
         public Menu()
         {
             DataContext = new MenuModel();
+            NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             this.InitializeComponent();
         }
     }

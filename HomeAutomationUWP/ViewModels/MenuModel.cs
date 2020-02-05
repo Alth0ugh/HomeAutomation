@@ -13,7 +13,6 @@ namespace HomeAutomationUWP.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Dictionary<string, Page> _activePages = new Dictionary<string, Page>();
         public MenuModel()
         {
             SetCommands();
@@ -22,6 +21,7 @@ namespace HomeAutomationUWP.ViewModels
         private void SetCommands()
         {
             Pool = new RelayCommand(ShowPoolMenu);
+            Light = new RelayCommand(ShowLightModule);
         }
 
         private ICommand _pool;
@@ -38,8 +38,22 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        private void ShowPoolMenu(object obj)
+        private ICommand _light;
+        public ICommand Light
         {
+            get
+            {
+                return _light;
+            }
+            set
+            {
+                _light = value;
+                NotifyPropertyChanged("Light");
+            }
+        }
+
+        private void ShowPoolMenu(object obj)
+        {/*
             Page page;
             if (_activePages.ContainsKey("poolMenu"))
             {
@@ -49,8 +63,13 @@ namespace HomeAutomationUWP.ViewModels
             {
                 _activePages.Add("poolMenu", new PoolMenu());
                 page = _activePages["poolMenu"];
-            }
-            Navigation.Navigation.Navigate(page.GetType());
+            }*/
+            Navigation.Navigation.Navigate(typeof(PoolMenu));
+        }
+
+        private void ShowLightModule(object obj)
+        {
+            Navigation.Navigation.Navigate(typeof(LightControl));
         }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
