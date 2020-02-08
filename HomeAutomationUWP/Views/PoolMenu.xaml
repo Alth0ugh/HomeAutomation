@@ -37,7 +37,6 @@
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Content="+" Command="{Binding AddTimeCommand}"/>
-            <Button Content="Serialize" Margin="10" Command="{Binding SerializeCommand}"/>
         </StackPanel>
 
         <ScrollViewer Grid.Column="0" Grid.Row="1">

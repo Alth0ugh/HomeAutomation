@@ -84,7 +84,6 @@ namespace HomeAutomationUWP.ViewModels
         {
             OnOffCommand = new RelayCommand(SetESPStatus);
             AddTimeCommand = new RelayCommand(AddTimeEntry);
-            SerializeCommand = new RelayCommand(Serialize);
         }
 
         /// <summary>
@@ -96,19 +95,16 @@ namespace HomeAutomationUWP.ViewModels
             ConvertIntervals();
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
             Windows.Storage.StorageFile file = await storageFolder.CreateFileAsync("test.txt", Windows.Storage.CreationCollisionOption.ReplaceExisting);
-            var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
+
             var serializer = new DataContractJsonSerializer(typeof(ObservableCollection<TimeSelectorCharacteristic>));
-            var memoryStream = new MemoryStream();
-            serializer.WriteObject(stream.GetOutputStreamAt(0).AsStreamForWrite(), ListOfTimeSelectors);
-            memoryStream.Position = 0;
-            var reader = new StreamReader(memoryStream);
-            stream.Dispose();
-            Debug.WriteLine(reader.ReadToEnd());
-            /*Task.Run(() =>
+
+            using (var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite))
             {
-                var fileStream = new FileStream((Windows.ApplicationModel.Package.Current.InstalledLocation)., FileMode.Create);
-                memoryStream.WriteTo(fileStream);
-            });*/
+                using (var outputStream = stream.GetOutputStreamAt(0))
+                {
+                    serializer.WriteObject(outputStream.AsStreamForWrite(), ListOfTimeSelectors);
+                }
+            }
         }
 
         /// <summary>
@@ -216,7 +212,6 @@ namespace HomeAutomationUWP.ViewModels
         public void OnNavigateBackAction(object obj)
         {
             Debug.WriteLine("serializing");
-            return;
             Serialize(null);
         }
     }
