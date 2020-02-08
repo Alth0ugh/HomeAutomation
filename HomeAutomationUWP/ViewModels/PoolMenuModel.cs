@@ -19,9 +19,8 @@ using Windows.Storage.Streams;
 
 namespace HomeAutomationUWP.ViewModels
 {
-    public class PoolMenuModel : INotifyPropertyChanged, INavigateBackAction
+    public class PoolMenuModel : BindableBase, INavigateBackAction
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         private bool _poolPower;
         public bool PoolPower
         {
@@ -199,14 +198,6 @@ namespace HomeAutomationUWP.ViewModels
             {
                 PoolPower = true;
             }
-        }
-
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public void OnNavigateBackAction(object obj)
