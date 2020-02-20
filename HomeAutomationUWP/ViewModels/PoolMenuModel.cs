@@ -27,9 +27,7 @@ namespace HomeAutomationUWP.ViewModels
     public class PoolMenuModel : BindableBase, INavigateBackAction
     {
         private System.Timers.Timer _reconnectTimer;
-        private TcpListener _listener;
-        private SslStream _stream;
-        private TcpClient _client;
+        private ESP8266 _client;
         private int _poolPower;
         public int PoolPower
         {
@@ -87,12 +85,30 @@ namespace HomeAutomationUWP.ViewModels
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 2, ToTime = 8 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 3, ToTime = 4 });
 
-            _listener = new TcpListener(443);
-            _listener.Start();
-            Task.Run(new Action(HandleESPConnection));
-
+            _client = new ESP8266();
+            _client.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
+            _client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
+            Task.Run(new Action(_client.Listen));
+            
             _reconnectTimer = new System.Timers.Timer(5000);
-            _reconnectTimer.Elapsed += new ElapsedEventHandler(Reconnect);
+            //_reconnectTimer.Elapsed += new ElapsedEventHandler(Reconnect);
+        }
+
+        private void OnESPDisconnected()
+        {
+            PoolPower = -1;
+        }
+
+        private async void OnESPConnected()
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                try
+                {
+                    PoolPower = await _client.GetPoolStatus();
+                }
+                catch { }
+            });
         }
 
         private void SetCommands()
@@ -204,60 +220,40 @@ namespace HomeAutomationUWP.ViewModels
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic());
         }
 
-        private void SetESPStatus(object obj)
+        private async void SetESPStatus(object obj)
         {
-            GetPoolStatus();
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                PoolPower = await _client.GetPoolStatus();
+            });
             string message;
 
             if (PoolPower == 1)
             {
-                message = "turnOff\n";
-                _stream.Write(ASCIIEncoding.ASCII.GetBytes(message));
+                try
+                {
+                    _client.TurnOff();
+                }
+                catch
+                { }
             }
             else if (PoolPower == 0)
             {
-                message = "turnOn\n";
-                _stream.Write(ASCIIEncoding.ASCII.GetBytes(message));
+                try
+                {
+                    _client.TurnOn();
+                }
+                catch
+                { }
             }
-            GetPoolStatus();
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async ()  =>
+            {
+                PoolPower = await _client.GetPoolStatus();
+            });
         }
 
-        private async Task GetPoolStatus()
-        {
-            string message = "getPoolStatus\n";
-            _stream.Write(ASCIIEncoding.ASCII.GetBytes(message));
-
-            string response = string.Empty;
-            char newCharacter;
-
-            do
-            {
-                newCharacter = (char)_stream.ReadByte();
-                if (newCharacter != '\n')
-                {
-                    response += newCharacter;
-                }
-            } while (newCharacter != '\n');
-
-            if (response == "true")
-            {
-                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,() =>
-                    {
-                        PoolPower = 1;
-                    }
-                );
-            }
-            else
-            {
-                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    PoolPower = 0;
-                }
-                );
-            }
-            
-        }
-
+        
+        /*
         private void Reconnect(object sender, ElapsedEventArgs e)
         {
             HandleESPConnection();
@@ -280,7 +276,7 @@ namespace HomeAutomationUWP.ViewModels
                 Debug.WriteLine("PoolPower = " + PoolPower);
             //}
         }
-
+*/
         public void OnNavigateBackAction(object obj)
         {
             Debug.WriteLine("serializing");
