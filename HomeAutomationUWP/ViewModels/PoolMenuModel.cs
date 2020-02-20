@@ -14,15 +14,24 @@ using HomeAutomationUWP.Helper_classes;
 using HomeAutomationUWP.Helper_interfaces;
 using System.Runtime.Serialization.Json;
 using System.IO;
+using System.Net.Security;
+using System.Net.Sockets;
 using System.Threading;
+using System.Timers;
 using Windows.Storage.Streams;
+using System.Security.Cryptography.X509Certificates;
+using Windows.UI.Core;
 
 namespace HomeAutomationUWP.ViewModels
 {
     public class PoolMenuModel : BindableBase, INavigateBackAction
     {
-        private bool _poolPower;
-        public bool PoolPower
+        private System.Timers.Timer _reconnectTimer;
+        private TcpListener _listener;
+        private SslStream _stream;
+        private TcpClient _client;
+        private int _poolPower;
+        public int PoolPower
         {
             get
             {
@@ -70,13 +79,20 @@ namespace HomeAutomationUWP.ViewModels
 
         public PoolMenuModel()
         {
-            PoolPower = false;
+            PoolPower = -1;
 
             SetCommands();
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 1, ToTime = 3 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 4, ToTime = 5 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 2, ToTime = 8 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 3, ToTime = 4 });
+
+            _listener = new TcpListener(443);
+            _listener.Start();
+            Task.Run(new Action(HandleESPConnection));
+
+            _reconnectTimer = new System.Timers.Timer(5000);
+            _reconnectTimer.Elapsed += new ElapsedEventHandler(Reconnect);
         }
 
         private void SetCommands()
@@ -190,14 +206,79 @@ namespace HomeAutomationUWP.ViewModels
 
         private void SetESPStatus(object obj)
         {
-            if (PoolPower)
+            GetPoolStatus();
+            string message;
+
+            if (PoolPower == 1)
             {
-                PoolPower = false;
+                message = "turnOff\n";
+                _stream.Write(ASCIIEncoding.ASCII.GetBytes(message));
+            }
+            else if (PoolPower == 0)
+            {
+                message = "turnOn\n";
+                _stream.Write(ASCIIEncoding.ASCII.GetBytes(message));
+            }
+            GetPoolStatus();
+        }
+
+        private async Task GetPoolStatus()
+        {
+            string message = "getPoolStatus\n";
+            _stream.Write(ASCIIEncoding.ASCII.GetBytes(message));
+
+            string response = string.Empty;
+            char newCharacter;
+
+            do
+            {
+                newCharacter = (char)_stream.ReadByte();
+                if (newCharacter != '\n')
+                {
+                    response += newCharacter;
+                }
+            } while (newCharacter != '\n');
+
+            if (response == "true")
+            {
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,() =>
+                    {
+                        PoolPower = 1;
+                    }
+                );
             }
             else
             {
-                PoolPower = true;
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    PoolPower = 0;
+                }
+                );
             }
+            
+        }
+
+        private void Reconnect(object sender, ElapsedEventArgs e)
+        {
+            HandleESPConnection();
+        }
+
+        public async void HandleESPConnection()
+        {
+            //if (_listener.Pending())
+            //{
+                _client = _listener.AcceptTcpClient();
+                _stream = new SslStream(_client.GetStream(), false);
+
+                Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+
+                var certificate = new X509Certificate2(storageFolder.Path + @"\Server.p12");
+                _stream.AuthenticateAsServer(certificate, clientCertificateRequired: false, enabledSslProtocols: System.Security.Authentication.SslProtocols.Tls11, checkCertificateRevocation: false);
+                _reconnectTimer.Stop();
+
+                await GetPoolStatus();
+                Debug.WriteLine("PoolPower = " + PoolPower);
+            //}
         }
 
         public void OnNavigateBackAction(object obj)

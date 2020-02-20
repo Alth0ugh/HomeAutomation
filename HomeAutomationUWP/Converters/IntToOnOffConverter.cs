@@ -7,23 +7,22 @@ using Windows.UI.Xaml.Data;
 
 namespace HomeAutomationUWP.Converters
 {
-    public class BoolToOnOffOpposite : IValueConverter
+    class IntToOnOffConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (value is bool)
+            if (value is int)
             {
-                switch((bool)value)
+                switch ((int)value)
                 {
-                    case true:
-                        return "Off";
-                        break;
-                    case false:
+                    case 1:
                         return "On";
-                        break;
+                    case 0:
+                        return "Off";
+                    case -1:
+                        return "Err";
                 }
             }
-
             return "Err";
         }
 
