@@ -71,9 +71,24 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private bool _isDeviceSelectorOpen = false;
+        public bool IsDeviceSelectorOpen
+        {
+            get
+            {
+                return _isDeviceSelectorOpen;
+            }
+            set
+            {
+                _isDeviceSelectorOpen = value;
+                NotifyPropertyChanged("IsDeviceSelectorOpen");
+            }
+        }
+
         public ICommand OnOffCommand { get; set; }
         public ICommand AddTimeCommand { get; set; }
         public ICommand SerializeCommand { get; set; }
+        public ICommand ReconnectCommand { get; set; }
 
         public PoolMenuModel()
         {
@@ -87,7 +102,7 @@ namespace HomeAutomationUWP.ViewModels
 
             _client = new ESP8266();
             _client.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
-            _client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
+            //_client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
             Task.Run(new Action(_client.Listen));
             
             _reconnectTimer = new System.Timers.Timer(5000);
@@ -97,6 +112,11 @@ namespace HomeAutomationUWP.ViewModels
         private void OnESPDisconnected()
         {
             PoolPower = -1;
+        }
+
+        private void ReconnectESP(object obj)
+        {
+            Task.Run(new Action(_client.Listen));
         }
 
         private async void OnESPConnected()
@@ -113,8 +133,9 @@ namespace HomeAutomationUWP.ViewModels
 
         private void SetCommands()
         {
-            OnOffCommand = new RelayCommand(SetESPStatus);
+            OnOffCommand = new AsyncRelayCommand(SetESPStatus);
             AddTimeCommand = new RelayCommand(AddTimeEntry);
+            ReconnectCommand = new RelayCommand(ReconnectESP);
         }
 
         /// <summary>
@@ -220,19 +241,32 @@ namespace HomeAutomationUWP.ViewModels
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic());
         }
 
-        private async void SetESPStatus(object obj)
+        private async Task UpdatePoolPower()
         {
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            int power = -1;
+            try
             {
-                PoolPower = await _client.GetPoolStatus();
-            });
-            string message;
+                power = await Task.Run(_client.GetPoolStatus);
+            }
+            catch { }
+            finally
+            {
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    PoolPower = power;
+                });
+            }
+        }
 
+        private async Task SetESPStatus(object obj)
+        {
+            await UpdatePoolPower();
+            string message;
             if (PoolPower == 1)
             {
                 try
                 {
-                    _client.TurnOff();
+                    await Task.Run(new Action(_client.TurnOff));
                 }
                 catch
                 { }
@@ -241,15 +275,12 @@ namespace HomeAutomationUWP.ViewModels
             {
                 try
                 {
-                    _client.TurnOn();
+                    await Task.Run(new Action(_client.TurnOn));
                 }
                 catch
                 { }
             }
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async ()  =>
-            {
-                PoolPower = await _client.GetPoolStatus();
-            });
+            await UpdatePoolPower();
         }
 
         
