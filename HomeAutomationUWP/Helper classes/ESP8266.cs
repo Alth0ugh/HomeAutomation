@@ -16,6 +16,8 @@ namespace HomeAutomationUWP.Helper_classes
         private const string _turnOn = "turnOn";
         private const string _turnOff = "turnOff";
 
+        private bool _isListening = false;
+
         public string IpAddress { get; set; }
         public int Port { get; set; }
 
@@ -30,9 +32,14 @@ namespace HomeAutomationUWP.Helper_classes
         public delegate void OnDisconnectedHandler();
         public event OnDisconnectedHandler OnDisconnected;
 
+        private Timer _reconnectTimer;
+
         public ESP8266()
         {
             _listener = new TcpListener(443);
+            _reconnectTimer = new Timer(5000);
+            _reconnectTimer.Stop();
+            //_reconnectTimer.Elapsed += new ElapsedEventHandler(Handl)
             LoadCertificate();
         }
 
@@ -45,13 +52,30 @@ namespace HomeAutomationUWP.Helper_classes
 
         public void Listen()
         {
+            if (_isListening)
+            {
+                return;
+            }
+            _isListening = true;
             _listener.Start();
             _client = _listener.AcceptTcpClient();
             _sslStream = new SslStream(_client.GetStream(), false);
-            _sslStream.AuthenticateAsServer(_certificate, 
-                clientCertificateRequired: false, 
-                enabledSslProtocols: System.Security.Authentication.SslProtocols.Tls11, 
-                checkCertificateRevocation: false);
+            try
+            {
+                _sslStream.AuthenticateAsServer(_certificate,
+                    clientCertificateRequired: false,
+                    enabledSslProtocols: System.Security.Authentication.SslProtocols.Tls11,
+                    checkCertificateRevocation: false);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _listener.Stop();
+                _isListening = false;
+            }
             OnConnected?.Invoke();
         }
 
@@ -70,6 +94,7 @@ namespace HomeAutomationUWP.Helper_classes
             }
             catch (Exception e)
             {
+                Listen();
                 throw e;
             }
         }
@@ -82,6 +107,7 @@ namespace HomeAutomationUWP.Helper_classes
             }
             catch (Exception e)
             {
+                Listen();
                 throw e;
             }
         }
