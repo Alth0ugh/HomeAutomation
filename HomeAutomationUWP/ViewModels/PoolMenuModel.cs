@@ -144,7 +144,7 @@ namespace HomeAutomationUWP.ViewModels
         private void SetCommands()
         {
             OnOffCommand = new AsyncRelayCommand(SetESPStatus);
-            AddTimeCommand = new RelayCommand(Test);
+            AddTimeCommand = new RelayCommand(AddTimeEntry);
             ReconnectCommand = new RelayCommand(ReconnectESP);
         }
 
@@ -239,7 +239,7 @@ namespace HomeAutomationUWP.ViewModels
                 }
                 */
             }
-            ListOfTimeSelectors = newArray;
+            ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>(newArray.Reverse());
         }
 
         /// <summary>
@@ -310,21 +310,9 @@ namespace HomeAutomationUWP.ViewModels
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
             var file = await storageFolder.OpenStreamForReadAsync("test.txt");
-            string json;
             
             var serializer = new DataContractJsonSerializer(typeof(ObservableCollection<TimeSelectorCharacteristic>));
-            var selectors = (ObservableCollection<TimeSelectorCharacteristic>)serializer.ReadObject(file);
-            if (selectors is ObservableCollection<TimeSelectorCharacteristic>)
-            {
-                Debug.WriteLine("True");
-            }
-            
-             ListOfTimeSelectors = selectors;
-            //foreach (var selector in selectors)
-            //{
-            //    ListOfTimeSelectors.Add(selector);
-            //}
-            //ListOfTimeSelectors = (ObservableCollection<TimeSelectorCharacteristic>)serializer.ReadObject(file);
+             ListOfTimeSelectors = (ObservableCollection<TimeSelectorCharacteristic>)serializer.ReadObject(file);
         }
     }
 }
