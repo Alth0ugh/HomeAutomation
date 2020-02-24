@@ -51,7 +51,22 @@ namespace HomeAutomationUWP.Navigation
         /// <param name="page">Page to navigate.</param>
         public static void Navigate(Type page)
         {
-            Frame?.Navigate(page);
+            if (Frame == null)
+            {
+                return;
+            }
+
+            Frame.Navigate(page);
+
+            var content = Frame.Content as Page;
+            if (content is Page)
+            {
+                var viewModel = content.DataContext;
+                if (viewModel is INavigateAction)
+                {
+                    Task.Run((viewModel as INavigateAction).NavigatedTo);
+                }
+            }
             //if (page is INavigateBackAction)
             //{
             //    var command = (BackButton?.Command as RelayCommand).Command;

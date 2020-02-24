@@ -24,9 +24,9 @@ using Windows.UI.Core;
 
 namespace HomeAutomationUWP.ViewModels
 {
-    public class PoolMenuModel : BindableBase, INavigateBackAction
+    public class PoolMenuModel : BindableBase, INavigateBackAction, INavigateAction
     {
-        private System.Timers.Timer _reconnectTimer;
+        private System.Timers.Timer _poolTimer;
         private ESP8266 _client;
         private int _poolPower;
         public int PoolPower
@@ -47,6 +47,10 @@ namespace HomeAutomationUWP.ViewModels
         {
             get
             {
+                if (_listOfTimeSelectors == null)
+                {
+                    return new ObservableCollection<TimeSelectorCharacteristic>();
+                }
                 return _listOfTimeSelectors;
             }
             set
@@ -95,18 +99,24 @@ namespace HomeAutomationUWP.ViewModels
             PoolPower = -1;
 
             SetCommands();
+            /*
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 1, ToTime = 3 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 4, ToTime = 5 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 2, ToTime = 8 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 3, ToTime = 4 });
-
+            */
             _client = new ESP8266();
             _client.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
             //_client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
             Task.Run(new Action(_client.Listen));
             
-            _reconnectTimer = new System.Timers.Timer(5000);
-            //_reconnectTimer.Elapsed += new ElapsedEventHandler(Reconnect);
+            _poolTimer = new System.Timers.Timer(5000);
+            _poolTimer.Elapsed += new ElapsedEventHandler(CheckPoolTime);
+        }
+
+        private void CheckPoolTime(object sender, ElapsedEventArgs e)
+        {
+            
         }
 
         private void OnESPDisconnected()
@@ -134,7 +144,7 @@ namespace HomeAutomationUWP.ViewModels
         private void SetCommands()
         {
             OnOffCommand = new AsyncRelayCommand(SetESPStatus);
-            AddTimeCommand = new RelayCommand(AddTimeEntry);
+            AddTimeCommand = new RelayCommand(Test);
             ReconnectCommand = new RelayCommand(ReconnectESP);
         }
 
@@ -251,10 +261,7 @@ namespace HomeAutomationUWP.ViewModels
             catch { }
             finally
             {
-                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                {
-                    PoolPower = power;
-                });
+                PoolPower = power;
             }
         }
 
@@ -283,35 +290,41 @@ namespace HomeAutomationUWP.ViewModels
             await UpdatePoolPower();
         }
 
-        
-        /*
-        private void Reconnect(object sender, ElapsedEventArgs e)
-        {
-            HandleESPConnection();
-        }
-
-        public async void HandleESPConnection()
-        {
-            //if (_listener.Pending())
-            //{
-                _client = _listener.AcceptTcpClient();
-                _stream = new SslStream(_client.GetStream(), false);
-
-                Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-
-                var certificate = new X509Certificate2(storageFolder.Path + @"\Server.p12");
-                _stream.AuthenticateAsServer(certificate, clientCertificateRequired: false, enabledSslProtocols: System.Security.Authentication.SslProtocols.Tls11, checkCertificateRevocation: false);
-                _reconnectTimer.Stop();
-
-                await GetPoolStatus();
-                Debug.WriteLine("PoolPower = " + PoolPower);
-            //}
-        }
-*/
         public void OnNavigateBackAction(object obj)
         {
             Debug.WriteLine("serializing");
             Serialize(null);
+        }
+
+        public void Test(object obj)
+        {
+            var a = new ObservableCollection<TimeSelectorCharacteristic>();
+
+            a.Add(new TimeSelectorCharacteristic() { FromTime = 10, ToTime = 20 });
+            a.Add(new TimeSelectorCharacteristic() { FromTime = 1, ToTime = 3 });
+
+            ListOfTimeSelectors = a;
+        }
+
+        public async Task NavigatedTo()
+        {
+            Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            var file = await storageFolder.OpenStreamForReadAsync("test.txt");
+            string json;
+            
+            var serializer = new DataContractJsonSerializer(typeof(ObservableCollection<TimeSelectorCharacteristic>));
+            var selectors = (ObservableCollection<TimeSelectorCharacteristic>)serializer.ReadObject(file);
+            if (selectors is ObservableCollection<TimeSelectorCharacteristic>)
+            {
+                Debug.WriteLine("True");
+            }
+            
+             ListOfTimeSelectors = selectors;
+            //foreach (var selector in selectors)
+            //{
+            //    ListOfTimeSelectors.Add(selector);
+            //}
+            //ListOfTimeSelectors = (ObservableCollection<TimeSelectorCharacteristic>)serializer.ReadObject(file);
         }
     }
 }
