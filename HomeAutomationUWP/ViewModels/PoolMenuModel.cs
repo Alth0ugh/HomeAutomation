@@ -107,16 +107,90 @@ namespace HomeAutomationUWP.ViewModels
             */
             _client = new ESP8266();
             _client.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
-            //_client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
+            _client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
             Task.Run(new Action(_client.Listen));
             
-            _poolTimer = new System.Timers.Timer(5000);
+            _poolTimer = new System.Timers.Timer(60000);
             _poolTimer.Elapsed += new ElapsedEventHandler(CheckPoolTime);
+            _poolTimer.Start();
         }
 
         private void CheckPoolTime(object sender, ElapsedEventArgs e)
         {
-            
+            _poolTimer.Stop();
+            var hour = DateTime.Now.Hour + 1;
+            var half = ListOfTimeSelectors.Count / 2;
+            int lIndex = 0;
+            int HIndex = ListOfTimeSelectors.Count - 1;
+            var hourFromSelector = ListOfTimeSelectors[half].FromTime;
+            int numberIndex = -1;
+
+            int previousStartingTimeIndex;
+            int nextStartingTimeIndex;
+
+            while (lIndex <= HIndex && numberIndex == -1)
+            {
+                if (hourFromSelector == hour)
+                {
+                    SetESPStatus(true);
+                    return;
+                }
+
+                if (hour < hourFromSelector)
+                {
+                    HIndex = half - 1;
+                    half = ((HIndex - lIndex) / 2) + lIndex;
+                }
+                else
+                {
+                    lIndex = half + 1;
+                    half = ((HIndex - lIndex) / 2) + lIndex;
+                }
+
+                hourFromSelector = ListOfTimeSelectors[half].FromTime;
+            }
+
+            if (HIndex != ListOfTimeSelectors.Count - 1)
+            {
+                if (PoolPower == 0)
+                {
+                    if ((ListOfTimeSelectors[lIndex].FromTime < hour &&
+                        ListOfTimeSelectors[lIndex].ToTime > hour) ||
+                        (ListOfTimeSelectors[HIndex].FromTime < hour &&
+                        ListOfTimeSelectors[HIndex].ToTime > hour))
+                    {
+                        SetESPStatus(true);
+                    }
+                }
+                else if (PoolPower == 1)
+                {
+                    if ((ListOfTimeSelectors[lIndex].FromTime > hour ||
+                        ListOfTimeSelectors[lIndex].ToTime < hour) ||
+                        (ListOfTimeSelectors[HIndex].FromTime > hour &&
+                        ListOfTimeSelectors[HIndex].ToTime < hour))
+                    {
+                        SetESPStatus(false);
+                    }
+                }
+            }
+            else
+            {
+                if (PoolPower == 0)
+                {
+                    if (ListOfTimeSelectors[HIndex].ToTime < hour && ListOfTimeSelectors[HIndex].ToTime > hour)
+                    {
+                        SetESPStatus(true);
+                    }
+                }
+                else if (PoolPower == 1)
+                {
+                    if (ListOfTimeSelectors[HIndex].ToTime > hour && ListOfTimeSelectors[HIndex].ToTime < hour)
+                    {
+                        SetESPStatus(false);
+                    }
+                }
+            }
+            _poolTimer.Start();
         }
 
         private void OnESPDisconnected()
@@ -267,8 +341,29 @@ namespace HomeAutomationUWP.ViewModels
 
         private async Task SetESPStatus(object obj)
         {
+            bool newStatus;
+            if (obj != null && obj is bool)
+            {
+                newStatus = (bool)obj;
+
+                if (PoolPower == 0 && newStatus == true)
+                {
+                    try
+                    {
+                        await Task.Run(new Action(_client.TurnOn));
+                    }
+                    catch { }
+                }
+                else if (PoolPower == 1 && newStatus == false)
+                {
+                    try
+                    {
+                        await Task.Run(new Action(_client.TurnOff));
+                    }
+                    catch { }
+                }
+            }
             await UpdatePoolPower();
-            string message;
             if (PoolPower == 1)
             {
                 try

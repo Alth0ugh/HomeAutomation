@@ -33,7 +33,9 @@
 
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
             <TextBlock Text="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=OneWay}" VerticalAlignment="Center"/>
-            <Button Content="{Binding PoolPower, Converter={StaticResource IntToOnOffOpposite}, Mode=OneWay}" Command="{Binding OnOffCommand}"/>
+            <Button x:Name="OnOffButton" 
+                    Content="{Binding PoolPower, Converter={StaticResource IntToOnOffOpposite}, Mode=OneWay}" 
+                    Command="{Binding OnOffCommand}"/>
             <Button Content="Refresh" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10"/>
         </StackPanel>
 
