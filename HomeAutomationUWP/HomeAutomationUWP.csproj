@@ -140,6 +140,7 @@
     <Compile Include="Helper classes\RelayCommand.cs" />
     <Compile Include="Helper classes\YeelightDevice.cs" />
     <Compile Include="Helper interfaces\IBackAction.cs" />
+    <Compile Include="Helper interfaces\INavigateAction.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
