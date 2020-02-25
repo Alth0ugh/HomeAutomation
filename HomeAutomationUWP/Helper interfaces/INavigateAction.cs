@@ -8,6 +8,6 @@ namespace HomeAutomationUWP.Helper_interfaces
 {
     public interface INavigateAction
     {
-        Task NavigatedTo();
+        void NavigatedTo();
     }
 }

@@ -24,7 +24,7 @@ using Windows.UI.Core;
 
 namespace HomeAutomationUWP.ViewModels
 {
-    public class PoolMenuModel : BindableBase, INavigateBackAction
+    public class PoolMenuModel : BindableBase, INavigateBackAction, INavigateAction
     {
         private PoolControler _client;
         private int _poolPower;
@@ -86,6 +86,7 @@ namespace HomeAutomationUWP.ViewModels
             _client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
             ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>(PoolChecker.PoolTimes);
             PoolChecker.OnPoolStateChanged += new PoolChecker.OnPoolStateChangedEventHandler(UpdatePoolState);
+            UpdatePoolState();
         }
 
         private void UpdatePoolState()
@@ -142,6 +143,11 @@ namespace HomeAutomationUWP.ViewModels
         {
             Debug.WriteLine("serializing");
             PoolChecker.Serialize(null);
+        }
+
+        public void NavigatedTo()
+        {
+            ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>(PoolChecker.PoolTimes);
         }
     }
 }
