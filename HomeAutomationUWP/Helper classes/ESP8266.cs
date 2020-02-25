@@ -159,7 +159,5 @@ namespace HomeAutomationUWP.Helper_classes
 
             return character;
         }
-
-        
     }
 }
