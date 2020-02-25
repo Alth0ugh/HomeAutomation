@@ -14,9 +14,6 @@ namespace HomeAutomationUWP.Helper_classes
 {
     public class ESP8266
     {
-        private const string _turnOn = "turnOn";
-        private const string _turnOff = "turnOff";
-
         private bool _isListening = false;
         private bool _isESPConnected = false;
 
@@ -118,7 +115,7 @@ namespace HomeAutomationUWP.Helper_classes
         /// </summary>
         /// <param name="message">Message to convert.</param>
         /// <returns>Message ready to be sent in bytes.</returns>
-        private byte[] MakeMessage(string message)
+        public byte[] MakeMessage(string message)
         {
             List<byte> array = new List<byte>(ASCIIEncoding.ASCII.GetBytes(message));
             array.Add((byte)'\n');
@@ -126,42 +123,10 @@ namespace HomeAutomationUWP.Helper_classes
         }
 
         /// <summary>
-        /// Turns on the pool.
-        /// </summary>
-        public void TurnOn()
-        {
-            try
-            {
-                Write(MakeMessage(_turnOn));
-            }
-            catch (Exception e)
-            {
-                Listen();
-                throw e;
-            }
-        }
-
-        /// <summary>
-        /// Turns off the pool.
-        /// </summary>
-        public void TurnOff()
-        {
-            try
-            {
-                Write(MakeMessage(_turnOff));
-            }
-            catch (Exception e)
-            {
-                Listen();
-                throw e;
-            }
-        }
-
-        /// <summary>
         /// Writes message.
         /// </summary>
         /// <param name="message"></param>
-        private void Write(byte[] message)
+        public void Write(byte[] message)
         {
             try
             {
@@ -178,7 +143,7 @@ namespace HomeAutomationUWP.Helper_classes
         /// Reads byte from buffer.
         /// </summary>
         /// <returns>The read byte.</returns>
-        private int ReadByte()
+        public int ReadByte()
         {
             int character;
 
@@ -195,50 +160,6 @@ namespace HomeAutomationUWP.Helper_classes
             return character;
         }
 
-        /// <summary>
-        /// Checks pool status.
-        /// </summary>
-        /// <returns>Pool status: 0 - OFF, 1 - ON</returns>
-        public Task<int> GetPoolStatus()
-        {
-            string message = "getPoolStatus\n";
-            try
-            {
-                Write(ASCIIEncoding.ASCII.GetBytes(message));
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-            string response = string.Empty;
-            char newCharacter;
-
-            do
-            {
-                try
-                {
-                    newCharacter = (char)ReadByte();
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-                if (newCharacter != '\n')
-                {
-                    response += newCharacter;
-                }
-            } while (newCharacter != '\n');
-
-            if (response == "true")
-            {
-                return Task.FromResult(1);
-            }
-            else
-            {
-                return Task.FromResult(0);
-            }
-
-        }
+        
     }
 }

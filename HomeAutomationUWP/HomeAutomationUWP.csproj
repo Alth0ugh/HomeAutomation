@@ -138,6 +138,7 @@
     <Compile Include="Helper classes\BindableBase.cs" />
     <Compile Include="Helper classes\ESP8266.cs" />
     <Compile Include="Helper classes\PoolChecker.cs" />
+    <Compile Include="Helper classes\PoolControler.cs" />
     <Compile Include="Helper classes\RelayCommand.cs" />
     <Compile Include="Helper classes\YeelightDevice.cs" />
     <Compile Include="Helper interfaces\IBackAction.cs" />
