@@ -14,7 +14,7 @@ namespace HomeAutomationUWP.Helper_classes
     public static class PoolChecker
     {
         private static StackTrace stackTrace = new StackTrace();
-        public static ESP8266 PoolClient { get; set; }
+        public static PoolControler PoolClient { get; set; }
         private static bool _isESPConnected = false;
         private static Timer _poolTimer;
 
@@ -27,7 +27,7 @@ namespace HomeAutomationUWP.Helper_classes
 
         public static void Init()
         {
-            PoolClient = new ESP8266();
+            PoolClient = new PoolControler();
             PoolClient.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
             PoolClient.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
             _poolTimer = new Timer(60000);
