@@ -13,7 +13,6 @@ namespace HomeAutomationUWP.Helper_classes
 {
     public static class PoolChecker
     {
-        private static StackTrace stackTrace = new StackTrace();
         public static PoolControler PoolClient { get; set; }
         private static bool _isESPConnected = false;
         private static Timer _poolTimer;
@@ -23,8 +22,14 @@ namespace HomeAutomationUWP.Helper_classes
         public static int PoolPower { get; set; }
 
         public delegate void OnPoolStateChangedEventHandler();
+        /// <summary>
+        /// Occurs when pool status changes.
+        /// </summary>
         public static event OnPoolStateChangedEventHandler OnPoolStateChanged;
 
+        /// <summary>
+        /// Initializes PoolChecker.
+        /// </summary>
         public static void Init()
         {
             PoolClient = new PoolControler();
@@ -131,6 +136,10 @@ namespace HomeAutomationUWP.Helper_classes
             PoolTimes = newArray;
         }
 
+        /// <summary>
+        /// Deserializes timings.
+        /// </summary>
+        /// <returns>List of timings.</returns>
         public static async Task<List<TimeSelectorCharacteristic>> GetPoolTimes()
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -151,6 +160,11 @@ namespace HomeAutomationUWP.Helper_classes
             _isESPConnected = false;
         }
 
+        /// <summary>
+        /// Checks whether it is time to turn on or off the pool according to the times.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private static void CheckPoolTime(object sender, ElapsedEventArgs e)
         {
             //_poolTimer.Stop();
@@ -226,9 +240,13 @@ namespace HomeAutomationUWP.Helper_classes
            // _poolTimer.Start();
         }
 
+        /// <summary>
+        /// Changes status of pool.
+        /// </summary>
+        /// <param name="obj">If true - turns pool on. If false - tunrs it off.</param>
+        /// <returns></returns>
         public static async Task SetESPStatus(object obj)
         {
-            Debug.WriteLine("Caller: " + stackTrace.GetFrame(2).GetMethod().Name);
             bool newStatus;
             if (obj != null && obj is bool)
             {
