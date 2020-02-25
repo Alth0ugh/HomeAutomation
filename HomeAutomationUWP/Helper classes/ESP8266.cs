@@ -44,6 +44,11 @@ namespace HomeAutomationUWP.Helper_classes
             LoadCertificate();
         }
 
+        /// <summary>
+        /// Checks if ESP8266 is still connected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TestConnectivity(object sender, ElapsedEventArgs e)
         {
             var message = "areYouAlive";
@@ -67,6 +72,9 @@ namespace HomeAutomationUWP.Helper_classes
             }
         }
 
+        /// <summary>
+        /// Loads server certificate.
+        /// </summary>
         private void LoadCertificate()
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -105,6 +113,11 @@ namespace HomeAutomationUWP.Helper_classes
             OnConnected?.Invoke();
         }
 
+        /// <summary>
+        /// Creates message for sending.
+        /// </summary>
+        /// <param name="message">Message to convert.</param>
+        /// <returns>Message ready to be sent in bytes.</returns>
         private byte[] MakeMessage(string message)
         {
             List<byte> array = new List<byte>(ASCIIEncoding.ASCII.GetBytes(message));
@@ -112,6 +125,9 @@ namespace HomeAutomationUWP.Helper_classes
             return array.ToArray();
         }
 
+        /// <summary>
+        /// Turns on the pool.
+        /// </summary>
         public void TurnOn()
         {
             try
@@ -125,6 +141,9 @@ namespace HomeAutomationUWP.Helper_classes
             }
         }
 
+        /// <summary>
+        /// Turns off the pool.
+        /// </summary>
         public void TurnOff()
         {
             try
@@ -138,6 +157,10 @@ namespace HomeAutomationUWP.Helper_classes
             }
         }
 
+        /// <summary>
+        /// Writes message.
+        /// </summary>
+        /// <param name="message"></param>
         private void Write(byte[] message)
         {
             try
@@ -151,6 +174,10 @@ namespace HomeAutomationUWP.Helper_classes
             }
         }
 
+        /// <summary>
+        /// Reads byte from buffer.
+        /// </summary>
+        /// <returns>The read byte.</returns>
         private int ReadByte()
         {
             int character;
@@ -168,6 +195,10 @@ namespace HomeAutomationUWP.Helper_classes
             return character;
         }
 
+        /// <summary>
+        /// Checks pool status.
+        /// </summary>
+        /// <returns>Pool status: 0 - OFF, 1 - ON</returns>
         public Task<int> GetPoolStatus()
         {
             string message = "getPoolStatus\n";
