@@ -39,14 +39,26 @@ namespace HomeAutomationUWP.Helper_classes
         {
             _listener = new TcpListener(443);
             _reconnectTimer = new Timer(60000);
-            _reconnectTimer.Elapsed += new ElapsedEventHandler(Test);
+            _reconnectTimer.Elapsed += new ElapsedEventHandler(TestConnectivity);
             _reconnectTimer.Start();
             LoadCertificate();
         }
 
-        private void Test(object sender, ElapsedEventArgs e)
+        private void TestConnectivity(object sender, ElapsedEventArgs e)
         {
-            Debug.WriteLine("ESP8266");
+            var message = "areYouAlive";
+            try
+            {
+                Write(MakeMessage(message));
+                while(_client.Available > 0)
+                {
+                    ReadByte();
+                }
+            }
+            catch
+            {
+                OnDisconnected?.Invoke();
+            }
         }
 
         private void LoadCertificate()
