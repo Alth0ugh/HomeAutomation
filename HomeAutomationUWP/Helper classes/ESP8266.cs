@@ -18,6 +18,7 @@ namespace HomeAutomationUWP.Helper_classes
         private const string _turnOff = "turnOff";
 
         private bool _isListening = false;
+        private bool _isESPConnected = false;
 
         public string IpAddress { get; set; }
         public int Port { get; set; }
@@ -38,9 +39,8 @@ namespace HomeAutomationUWP.Helper_classes
         public ESP8266()
         {
             _listener = new TcpListener(443);
-            _reconnectTimer = new Timer(60000);
+            _reconnectTimer = new Timer(6000);
             _reconnectTimer.Elapsed += new ElapsedEventHandler(TestConnectivity);
-            _reconnectTimer.Start();
             LoadCertificate();
         }
 
@@ -49,15 +49,21 @@ namespace HomeAutomationUWP.Helper_classes
             var message = "areYouAlive";
             try
             {
+                string response = string.Empty;
                 Write(MakeMessage(message));
-                while(_client.Available > 0)
+                do
                 {
-                    ReadByte();
-                }
+                    response += (char)ReadByte();
+                } while (_client.Available > 0);
             }
             catch
             {
-                OnDisconnected?.Invoke();
+                if (_isESPConnected)
+                {
+                    OnDisconnected?.Invoke();
+                    Task.Run(new Action(Listen));
+                    _isESPConnected = false;
+                }
             }
         }
 
@@ -91,9 +97,11 @@ namespace HomeAutomationUWP.Helper_classes
             }
             finally
             {
+                _reconnectTimer.Start();
                 _listener.Stop();
                 _isListening = false;
             }
+            _isESPConnected = true;
             OnConnected?.Invoke();
         }
 
