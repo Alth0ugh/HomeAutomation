@@ -123,6 +123,10 @@ namespace HomeAutomationUWP.ViewModels
 
         private void ReconnectESP(object obj)
         {
+            if (_client == null)
+            {
+                return;
+            }
             Task.Run(new Action(_client.Listen));
         }
 
