@@ -26,8 +26,11 @@ namespace HomeAutomationUWP.ViewModels
 {
     public class PoolMenuModel : BindableBase, INavigateBackAction
     {
-        private ESP8266 _client;
+        private PoolControler _client;
         private int _poolPower;
+        /// <summary>
+        /// Indicates the status of the pool. 1 - ON, 0 - OFF, -1 - ERROR
+        /// </summary>
         public int PoolPower
         {
             get
@@ -42,6 +45,9 @@ namespace HomeAutomationUWP.ViewModels
         }
 
         private ObservableCollection<TimeSelectorCharacteristic> _listOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>();
+        /// <summary>
+        /// Lists the times when the pool should be on.
+        /// </summary>
         public ObservableCollection<TimeSelectorCharacteristic> ListOfTimeSelectors
         {
             get
@@ -56,35 +62,6 @@ namespace HomeAutomationUWP.ViewModels
             {
                 _listOfTimeSelectors = value;
                 NotifyPropertyChanged("ListOfTimeSelectors");
-            }
-        }
-
-        private ushort _fromTime = 1;
-        public ushort FromTime
-        {
-            get
-            {
-                return _fromTime;
-            }
-            set
-            {
-                _fromTime = value;
-                Debug.WriteLine("FromTime changed: " + value);
-                NotifyPropertyChanged("FromTime");
-            }
-        }
-
-        private bool _isDeviceSelectorOpen = false;
-        public bool IsDeviceSelectorOpen
-        {
-            get
-            {
-                return _isDeviceSelectorOpen;
-            }
-            set
-            {
-                _isDeviceSelectorOpen = value;
-                NotifyPropertyChanged("IsDeviceSelectorOpen");
             }
         }
 
@@ -156,7 +133,9 @@ namespace HomeAutomationUWP.ViewModels
         /// <param name="obj"></param>
         private void AddTimeEntry(object obj)
         {
-            ListOfTimeSelectors.Add(new TimeSelectorCharacteristic());
+            var newTime = new TimeSelectorCharacteristic();
+            ListOfTimeSelectors.Add(newTime);
+            PoolChecker.PoolTimes.Add(newTime);
         }
 
         public void OnNavigateBackAction(object obj)
@@ -164,17 +143,5 @@ namespace HomeAutomationUWP.ViewModels
             Debug.WriteLine("serializing");
             PoolChecker.Serialize(null);
         }
-
-        public void Test(object obj)
-        {
-            var a = new ObservableCollection<TimeSelectorCharacteristic>();
-
-            a.Add(new TimeSelectorCharacteristic() { FromTime = 10, ToTime = 20 });
-            a.Add(new TimeSelectorCharacteristic() { FromTime = 1, ToTime = 3 });
-
-            ListOfTimeSelectors = a;
-        }
-
-        
     }
 }
