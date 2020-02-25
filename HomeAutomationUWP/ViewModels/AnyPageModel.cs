@@ -29,6 +29,7 @@ namespace HomeAutomationUWP.ViewModels
         public AnyPageModel()
         {
             SetCommands();
+            PoolChecker.Init();
         }
 
         private void SetCommands()

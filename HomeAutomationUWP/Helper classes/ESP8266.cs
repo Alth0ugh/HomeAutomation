@@ -8,10 +8,11 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Windows.UI.Core;
 using System.Timers;
+using System.Diagnostics;
 
 namespace HomeAutomationUWP.Helper_classes
 {
-    class ESP8266
+    public class ESP8266
     {
         private const string _turnOn = "turnOn";
         private const string _turnOff = "turnOff";
@@ -37,10 +38,15 @@ namespace HomeAutomationUWP.Helper_classes
         public ESP8266()
         {
             _listener = new TcpListener(443);
-            _reconnectTimer = new Timer(5000);
-            _reconnectTimer.Stop();
-            //_reconnectTimer.Elapsed += new ElapsedEventHandler(Handl)
+            _reconnectTimer = new Timer(60000);
+            _reconnectTimer.Elapsed += new ElapsedEventHandler(Test);
+            _reconnectTimer.Start();
             LoadCertificate();
+        }
+
+        private void Test(object sender, ElapsedEventArgs e)
+        {
+            Debug.WriteLine("ESP8266");
         }
 
         private void LoadCertificate()
