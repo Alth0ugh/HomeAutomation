@@ -30,7 +30,7 @@ namespace HomeAutomationUWP.Helper_classes
             PoolClient = new ESP8266();
             PoolClient.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
             PoolClient.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
-            _poolTimer = new Timer();
+            _poolTimer = new Timer(60000);
             _poolTimer.Elapsed += new ElapsedEventHandler(CheckPoolTime);
 
             Task.Run(async () =>
