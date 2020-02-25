@@ -64,7 +64,7 @@ namespace HomeAutomationUWP.Navigation
                 var viewModel = content.DataContext;
                 if (viewModel is INavigateAction)
                 {
-                    Task.Run((viewModel as INavigateAction).NavigatedTo);
+                    (viewModel as INavigateAction).NavigatedTo();
                 }
             }
             //if (page is INavigateBackAction)

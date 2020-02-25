@@ -35,7 +35,7 @@ namespace HomeAutomationUWP.Helper_classes
             PoolClient = new PoolControler();
             PoolClient.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
             PoolClient.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
-            _poolTimer = new Timer(60000);
+            _poolTimer = new Timer(6000);
             _poolTimer.Elapsed += new ElapsedEventHandler(CheckPoolTime);
 
             Task.Run(async () =>
@@ -150,9 +150,10 @@ namespace HomeAutomationUWP.Helper_classes
         }
 
 
-        private static void OnESPConnected()
+        private async static void OnESPConnected()
         {
             _isESPConnected = true;
+            PoolPower = await PoolClient.GetPoolStatus();
         }
 
         private static void OnESPDisconnected()
@@ -167,16 +168,18 @@ namespace HomeAutomationUWP.Helper_classes
         /// <param name="e"></param>
         private static void CheckPoolTime(object sender, ElapsedEventArgs e)
         {
-            //_poolTimer.Stop();
+            _poolTimer.Stop();
             var hour = DateTime.Now.Hour + 1;
-            var half = PoolTimes.Count / 2;
+            var half = (PoolTimes.Count - 1) / 2;
             int lIndex = 0;
             int HIndex = PoolTimes.Count - 1;
-            var hourFromSelector = PoolTimes[half].FromTime;
+            int hourFromSelector;
             int numberIndex = -1;
 
             while (lIndex <= HIndex && numberIndex == -1)
             {
+                hourFromSelector = PoolTimes[half].FromTime;
+
                 if (hourFromSelector == hour)
                 {
                     SetESPStatus(true);
@@ -194,7 +197,6 @@ namespace HomeAutomationUWP.Helper_classes
                     half = ((HIndex - lIndex) / 2) + lIndex;
                 }
 
-                hourFromSelector = PoolTimes[half].FromTime;
             }
 
             if (HIndex != PoolTimes.Count - 1)
