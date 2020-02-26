@@ -39,8 +39,36 @@ namespace HomeAutomationUWP.ViewModels
             }
             set
             {
+                if (_poolPower == -1)
+                {
+                    _poolPower = value;
+                    return;
+                }
+                if (value == 0)
+                {
+                    _client.TurnOff();
+                }
+                else if (value == 1)
+                {
+                    _client.TurnOn();
+                }
                 _poolPower = value;
                 NotifyPropertyChanged("PoolPower");
+            }
+        }
+
+        private bool _manualMode = false;
+        public bool ManualMode
+        {
+            get
+            {
+                return _manualMode;
+            }
+            set
+            {
+                _manualMode = value;
+                PoolChecker.SetManualMode(_manualMode);
+                NotifyPropertyChanged("ManualMode");
             }
         }
 
