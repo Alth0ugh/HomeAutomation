@@ -13,11 +13,12 @@
 
     <Page.Resources>
         <converters:BoolToStringConverter x:Name="BoolToString"/>
-        <converters:BoolToOnOFfOpposite x:Name="BoolToOnOffOpposite"/>
         <converters:IntToStringConverter x:Name="IntToString"/>
         <converters:UShortToUShortConverter x:Name="UShortToUShort"/>
         <converters:UShortToString x:Name="UShortToString"/>
         <converters:StringToUShort x:Name="StringToUShort"/>
+        <converters:IntToOnOffConverter x:Name="IntToOnOff"/>
+        <converters:IntToOnOffOppositeConverter x:Name="IntToOnOffOpposite"/>
     </Page.Resources>
 
     <Grid>
@@ -31,13 +32,17 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
-            <TextBlock Text="{Binding PoolPower, Converter={StaticResource BoolToString}, Mode=OneWay}" VerticalAlignment="Center"/>
-            <Button Content="{Binding PoolPower, Converter={StaticResource BoolToOnOffOpposite}, Mode=OneWay}" Command="{Binding OnOffCommand}"/>
+            <!--<TextBlock Text="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=OneWay}" VerticalAlignment="Center"/>-->
+            <!--<Button x:Name="OnOffButton" 
+                    Content="{Binding PoolPower, Converter={StaticResource IntToOnOffOpposite}, Mode=OneWay}" 
+                    Command="{Binding OnOffCommand}"/>-->
+            <CheckBox Content="Manual" IsChecked="{Binding ManualMode, Mode=TwoWay}"/>
+            <ToggleSwitch Header="Power" IsOn="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=TwoWay}" IsEnabled="{Binding ManualMode}"/>
+            <Button Content="Refresh" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10"/>
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Content="+" Command="{Binding AddTimeCommand}"/>
-            <Button Content="Serialize" Margin="10" Command="{Binding SerializeCommand}"/>
         </StackPanel>
 
         <ScrollViewer Grid.Column="0" Grid.Row="1">

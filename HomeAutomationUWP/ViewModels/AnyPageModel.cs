@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using HomeAutomationUWP.Navigation;
 using HomeAutomationUWP.Helper_classes;
+using System.Diagnostics;
 
 namespace HomeAutomationUWP.ViewModels
 {
@@ -28,6 +29,7 @@ namespace HomeAutomationUWP.ViewModels
         public AnyPageModel()
         {
             SetCommands();
+            PoolChecker.Init();
         }
 
         private void SetCommands()
@@ -38,6 +40,11 @@ namespace HomeAutomationUWP.ViewModels
         private void Back(object obj)
         {
             Navigation.Navigation.GoBack();
+        }
+
+        private void Test(object obj)
+        {
+            Debug.WriteLine("Is executing");
         }
     }
 }

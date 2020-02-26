@@ -12,7 +12,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.15063.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -126,15 +126,23 @@
       <DependentUpon>TimeSelector.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\IntToOnOffConverter.cs" />
+    <Compile Include="Converters\IntToOnOffOppositeConverter.cs" />
     <Compile Include="Converters\StringToUShort.cs" />
     <Compile Include="Converters\UShortToUShortConverter.cs" />
-    <Compile Include="Converters\BoolToOnOFfOpposite.cs" />
+    <Compile Include="Converters\BoolToOnOffOpposite.cs" />
     <Compile Include="Converters\BoolToStringConverter.cs" />
     <Compile Include="Converters\IntToStringConverter.cs" />
     <Compile Include="Converters\UShortToString.cs" />
+    <Compile Include="Helper classes\AsyncRelayCommand.cs" />
     <Compile Include="Helper classes\BindableBase.cs" />
+    <Compile Include="Helper classes\ESP8266.cs" />
+    <Compile Include="Helper classes\PoolChecker.cs" />
+    <Compile Include="Helper classes\PoolControler.cs" />
     <Compile Include="Helper classes\RelayCommand.cs" />
     <Compile Include="Helper classes\YeelightDevice.cs" />
+    <Compile Include="Helper interfaces\IBackAction.cs" />
+    <Compile Include="Helper interfaces\INavigateAction.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

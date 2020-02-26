@@ -64,6 +64,7 @@ namespace HomeAutomationUWP.ViewModels
                 _activePages.Add("poolMenu", new PoolMenu());
                 page = _activePages["poolMenu"];
             }*/
+
             Navigation.Navigation.Navigate(typeof(PoolMenu));
         }
 
