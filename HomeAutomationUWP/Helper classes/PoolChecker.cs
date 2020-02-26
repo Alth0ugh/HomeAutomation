@@ -166,10 +166,18 @@ namespace HomeAutomationUWP.Helper_classes
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void CheckPoolTime(object sender, ElapsedEventArgs e)
+        private async static void CheckPoolTime(object sender, ElapsedEventArgs e)
         {
+            try
+            {
+                PoolPower = await PoolClient.GetPoolStatus();
+            }
+            catch
+            {
+                return;
+            }
             _poolTimer.Stop();
-            var hour = DateTime.Now.Hour + 1;
+            var hour = DateTime.Now.Hour - 2;
             var half = (PoolTimes.Count - 1) / 2;
             int lIndex = 0;
             int HIndex = PoolTimes.Count - 1;
@@ -182,7 +190,11 @@ namespace HomeAutomationUWP.Helper_classes
 
                 if (hourFromSelector == hour)
                 {
-                    SetESPStatus(true);
+                    if (PoolPower == 0)
+                    {
+                        await SetESPStatus(true);
+                    }
+                    _poolTimer.Start();
                     return;
                 }
 
@@ -213,10 +225,10 @@ namespace HomeAutomationUWP.Helper_classes
                 }
                 else if (PoolPower == 1)
                 {
-                    if ((PoolTimes[lIndex].FromTime > hour ||
-                        PoolTimes[lIndex].ToTime < hour) ||
-                        (PoolTimes[HIndex].FromTime > hour &&
-                        PoolTimes[HIndex].ToTime < hour))
+                    if (!((PoolTimes[lIndex].FromTime < hour &&
+                        PoolTimes[lIndex].ToTime > hour) ||
+                        (PoolTimes[HIndex].FromTime < hour &&
+                        PoolTimes[HIndex].ToTime > hour)))
                     {
                         SetESPStatus(false);
                     }
@@ -226,20 +238,33 @@ namespace HomeAutomationUWP.Helper_classes
             {
                 if (PoolPower == 0)
                 {
-                    if (PoolTimes[HIndex].ToTime < hour && PoolTimes[HIndex].ToTime > hour)
+                    if (PoolTimes[HIndex].FromTime <= hour && PoolTimes[HIndex].ToTime > hour)
                     {
                         SetESPStatus(true);
                     }
                 }
                 else if (PoolPower == 1)
                 {
-                    if (PoolTimes[HIndex].ToTime > hour && PoolTimes[HIndex].ToTime < hour)
+                    if (PoolTimes[HIndex].FromTime > hour || PoolTimes[HIndex].ToTime <= hour)
                     {
                         SetESPStatus(false);
                     }
                 }
             }
-           // _poolTimer.Start();
+            _poolTimer.Start();
+        }
+
+        public static void SetManualMode(bool manualMode)
+        {
+            switch (manualMode)
+            {
+                case true:
+                    _poolTimer.Stop();
+                    break;
+                case false:
+                    _poolTimer.Start();
+                    break;
+            }
         }
 
         /// <summary>
@@ -271,8 +296,7 @@ namespace HomeAutomationUWP.Helper_classes
                     catch { }
                 }
             }
-            await UpdatePoolPower();
-            if (PoolPower == 1)
+            else if (PoolPower == 1)
             {
                 try
                 {
