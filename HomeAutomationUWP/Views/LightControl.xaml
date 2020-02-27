@@ -9,7 +9,7 @@
     xmlns:converters="using:HomeAutomationUWP.Converters"
     mc:Ignorable="d"
     x:Name="lightControl"
-    Background="White">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Name="BoolToVisibilityConverter"/>

@@ -143,6 +143,11 @@ namespace HomeAutomationUWP.Helper_classes
         public static async Task<List<TimeSelectorCharacteristic>> GetPoolTimes()
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            var f = await storageFolder.TryGetItemAsync("test.txt");
+            if (f == null)
+            {
+                return new List<TimeSelectorCharacteristic>();
+            }
             var file = await storageFolder.OpenStreamForReadAsync("test.txt");
 
             var serializer = new DataContractJsonSerializer(typeof(List<TimeSelectorCharacteristic>));
