@@ -206,21 +206,26 @@ namespace HomeAutomationUWP.Helper_classes
         private void SendCommand(YeelightCommand yeelightCommand)
         {
             var networkStream = new NetworkStream(_tcpClient.Client);
-            var ms = new MemoryStream();
-            _serializer.WriteObject(ms, yeelightCommand);
-            ms.Position = 0;
-            var sr = new StreamReader(ms);
-            var a = sr.ReadLine() + "\r\n";
-            var ns = new NetworkStream(_tcpClient.Client);
+            var memoryStream = new MemoryStream();
+            _serializer.WriteObject(memoryStream, yeelightCommand);
+            memoryStream.Position = 0;
+            var streamReader = new StreamReader(memoryStream);
+            var message = streamReader.ReadLine() + "\r\n";                     //Each message ends with \r\n
             try
             {
-                ns.Write(Encoding.ASCII.GetBytes(a), 0, a.Length);
+                networkStream.Write(MakeMessage(message), 0, message.Length);
                 return;
             }
             catch
             {
                 return;
             }
+        }
+
+        private byte[] MakeMessage(string text)
+        {
+            var message = text + "\r\n";
+            return ASCIIEncoding.ASCII.GetBytes(message);
         }
     }
 
