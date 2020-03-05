@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +10,6 @@ namespace HomeAutomationUWP.Helper_classes
     {
         private const string _turnOn = "turnOn";
         private const string _turnOff = "turnOff";
-
-        private StackTrace stack = new StackTrace();
 
         /// <summary>
         /// Turns on the pool.
@@ -52,7 +49,6 @@ namespace HomeAutomationUWP.Helper_classes
         /// <returns>Pool status: 0 - OFF, 1 - ON</returns>
         public Task<int> GetPoolStatus()
         {
-            Debug.WriteLine(stack.GetFrame(1).GetMethod().Name);
             string message = "getPoolStatus\n";
             try
             {
