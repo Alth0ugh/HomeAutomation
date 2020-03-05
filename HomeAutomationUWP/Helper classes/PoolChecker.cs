@@ -177,7 +177,7 @@ namespace HomeAutomationUWP.Helper_classes
                 return;
             }
             _poolTimer.Stop();
-            var hour = DateTime.Now.Hour - 1;
+            var hour = DateTime.Now.Hour - 2;
             var half = (PoolTimes.Count - 1) / 2;
             int lIndex = 0;
             int HIndex = PoolTimes.Count - 1;
