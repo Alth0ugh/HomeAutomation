@@ -150,18 +150,6 @@ namespace HomeAutomationUWP.Helper_classes
                 return;
             }
             SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
-
-            Task.Delay(1000);
-            
-            var networkStream = new NetworkStream(_tcpClient.Client);
-            Debug.Write((char)networkStream.ReadByte());
-            while (_tcpClient.Client.Available > 0)
-            {
-                Debug.Write((char)networkStream.ReadByte());
-            }
-            Debug.WriteLine("");
-            return;
-            //return SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
         }
 
         /// <summary>
