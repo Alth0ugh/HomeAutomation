@@ -24,7 +24,7 @@
         <TextBox x:Name="ToText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True" Text="{Binding To, Converter={StaticResource UShortToString}}"/>
         <Button x:Name="toIncrease" Content="+" Click="ChangeTime" VerticalAlignment="Center" Margin="0,0,2,0"/>
         <Button x:Name="toDecrease" Content="-" Click="ChangeTime" VerticalAlignment="Center" Margin="0,0,5,0"/>
-        <Button VerticalAlignment="Center" Margin="0,0,5,0" Command="{Binding DeleteEntry}" CommandParameter="{Binding}">
+        <Button VerticalAlignment="Center" Margin="0,0,5,0" Command="{Binding DeleteEntry}" CommandParameter="{Binding CurrentCharacteristic}">
             <iconPacks:PackIconMaterial Kind="Delete"/>
         </Button>
     </StackPanel>

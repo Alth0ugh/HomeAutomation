@@ -42,7 +42,35 @@ namespace HomeAutomationUWP.Controls
         public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)0));
         public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register(nameof(To), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)5));
 
-        public TimeSelectorCharacteristic CurrentCharacteristic { get; set; }
+        public static readonly DependencyProperty CurrentCharacteristicDependencyProperty = DependencyProperty.Register(nameof(CurrentCharacteristic), typeof(TimeSelectorCharacteristic), typeof(TimeSelector), PropertyMetadata.Create(new TimeSelectorCharacteristic() { FromTime = 0, ToTime = 1 },new PropertyChangedCallback(SetValues)));
+        public TimeSelectorCharacteristic CurrentCharacteristic
+        {
+            get
+            {
+                return (TimeSelectorCharacteristic)GetValue(CurrentCharacteristicDependencyProperty);
+            }
+            set
+            {
+                SetValue(CurrentCharacteristicDependencyProperty, value);
+                SetValues(null, null);
+            }
+        }
+
+        private static void SetValues(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            var characteristic = e.NewValue as TimeSelectorCharacteristic;
+            var selector = obj as TimeSelector;
+            if (characteristic != null && selector != null)
+            {
+                selector.To = characteristic.ToTime;
+                selector.From = characteristic.FromTime;
+            }
+            else
+            {
+                selector.From = 0;
+                selector.To = 1;
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -85,19 +113,16 @@ namespace HomeAutomationUWP.Controls
             }
         }
 
-        public static readonly DependencyProperty DeleteProperty = DependencyProperty.Register(nameof(DeleteEntry), typeof(ICommand), typeof(TimeSelector), PropertyMetadata.Create(new RelayCommand(new Action<object>(o => { Debug.WriteLine("Delete"); }))));
-        private ICommand _deleteProperty = new RelayCommand(new Action<object>(o => { Debug.WriteLine("Delete"); }));
+        public static readonly DependencyProperty DeleteProperty = DependencyProperty.Register(nameof(DeleteEntry), typeof(ICommand), typeof(TimeSelector), PropertyMetadata.Create(new RelayCommand(new Action<object>(o => {  }))));
         public ICommand DeleteEntry
         {
             get
             {
                 return (ICommand)GetValue(DeleteProperty);
-                //return _deleteProperty;
             }
             set
             {
                 SetValue(DeleteProperty, value);
-                //_deleteProperty = value;
                 NotifyPropertyChanged("DeleteEntry");
             }
         }

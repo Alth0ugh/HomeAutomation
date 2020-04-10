@@ -160,7 +160,12 @@ namespace HomeAutomationUWP.ViewModels
 
         public void DeleteTimeEntry(object sender)
         {
-            Debug.WriteLine("VM");
+            var characteristic = sender as TimeSelectorCharacteristic;
+
+            if (characteristic != null)
+            {
+                ListOfTimeSelectors.Remove(characteristic);
+            }
         }
 
         /// <summary>
