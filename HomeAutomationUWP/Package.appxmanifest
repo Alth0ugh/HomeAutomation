@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" IgnorableNamespaces="uap mp iot uap3">
   <Identity Name="d80d4400-fd4f-4a16-88f0-5869f296b836" Publisher="CN=Oliver Piter" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="d80d4400-fd4f-4a16-88f0-5869f296b836" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
@@ -23,7 +23,15 @@
     </Application>
   </Applications>
   <Capabilities>
-    <Capability Name="internetClient" />
     <Capability Name="internetClientServer" />
+    <Capability Name="internetClient" />
+    <Capability Name="codeGeneration" />
+    <Capability Name="privateNetworkClientServer" />
+    <iot:Capability Name="lowLevelDevices" />
+    <uap:Capability Name="enterpriseAuthentication" />
+    <uap:Capability Name="chat" />
+    <uap3:Capability Name="remoteSystem" />
+    <uap:Capability Name="sharedUserCertificates" />
+    <DeviceCapability Name="lowLevel" />
   </Capabilities>
 </Package>

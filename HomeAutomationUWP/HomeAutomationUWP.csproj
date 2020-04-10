@@ -134,6 +134,7 @@
     <Compile Include="Converters\BoolToStringConverter.cs" />
     <Compile Include="Converters\IntToStringConverter.cs" />
     <Compile Include="Converters\UShortToString.cs" />
+    <Compile Include="DataAccess.cs" />
     <Compile Include="Helper classes\AsyncRelayCommand.cs" />
     <Compile Include="Helper classes\BindableBase.cs" />
     <Compile Include="Helper classes\ESP8266.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Helper classes\YeelightDevice.cs" />
     <Compile Include="Helper interfaces\IBackAction.cs" />
     <Compile Include="Helper interfaces\INavigateAction.cs" />
+    <Compile Include="Helper interfaces\ISignalrServer.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

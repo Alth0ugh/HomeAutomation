@@ -21,6 +21,8 @@ using System.Timers;
 using Windows.Storage.Streams;
 using System.Security.Cryptography.X509Certificates;
 using Windows.UI.Core;
+using SignalRServer.Interfaces;
+using HomeAutomationUWP;
 
 namespace HomeAutomationUWP.ViewModels
 {
@@ -46,11 +48,11 @@ namespace HomeAutomationUWP.ViewModels
                 }
                 if (value == 0)
                 {
-                    _client.TurnOff();
+                    //_client.TurnOff();
                 }
                 else if (value == 1)
                 {
-                    _client.TurnOn();
+                    //_client.TurnOn();
                 }
                 _poolPower = value;
                 NotifyPropertyChanged("PoolPower");
@@ -98,6 +100,8 @@ namespace HomeAutomationUWP.ViewModels
         public ICommand SerializeCommand { get; set; }
         public ICommand ReconnectCommand { get; set; }
 
+        private DataAccess da;
+
         public PoolMenuModel()
         {
             PoolPower = -1;
@@ -115,6 +119,14 @@ namespace HomeAutomationUWP.ViewModels
             ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>(PoolChecker.PoolTimes);
             PoolChecker.OnPoolStateChanged += new PoolChecker.OnPoolStateChangedEventHandler(UpdatePoolState);
             UpdatePoolState();
+            da = new DataAccess();
+            da.Init().Wait();
+            GetData();
+        }
+
+        public async Task GetData()
+        {
+            var a = await da.GetPoolStatus();
         }
 
         private void UpdatePoolState()

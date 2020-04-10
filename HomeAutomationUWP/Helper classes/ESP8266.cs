@@ -76,7 +76,8 @@ namespace HomeAutomationUWP.Helper_classes
         {
             Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
-            _certificate = new X509Certificate2(storageFolder.Path + @"\Server.p12");
+            //_certificate = new X509Certificate2(storageFolder.Path + @"\raspi2.p12");
+            _certificate = new X509Certificate2();
         }
 
         public void Listen()
