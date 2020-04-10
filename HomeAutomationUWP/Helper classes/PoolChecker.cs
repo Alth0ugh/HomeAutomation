@@ -83,6 +83,7 @@ namespace HomeAutomationUWP.Helper_classes
         /// </summary>
         private static void ConvertIntervals()
         {
+            
             var oldArray = SortIntervals();
             List<TimeSelectorCharacteristic> newArray = new List<TimeSelectorCharacteristic>();
             if (oldArray.Count == 0)
@@ -102,35 +103,6 @@ namespace HomeAutomationUWP.Helper_classes
                 {
                     top.ToTime = oldArray[i].ToTime;
                 }
-                /*
-                int j = i + 1;
-                //for (int j = i + 1; j < PoolTimes.Count; j++)
-                while(j < PoolTimes.Count)
-                {
-                    if (PoolTimes[j].FromTime == PoolTimes[i].FromTime && PoolTimes[j].ToTime == PoolTimes[i].ToTime)
-                    {
-                        PoolTimes.RemoveAt(j);
-                    }
-                    else if (PoolTimes[j].FromTime <= PoolTimes[i].FromTime && PoolTimes[j].ToTime >= PoolTimes[i].FromTime)
-                    {
-                        PoolTimes[i].FromTime = PoolTimes[j].FromTime;
-                        PoolTimes.RemoveAt(j);
-                    }
-                    else if (PoolTimes[j].ToTime >= PoolTimes[i].ToTime && PoolTimes[j].FromTime <= PoolTimes[i].ToTime)
-                    {
-                        PoolTimes[i].ToTime = PoolTimes[j].ToTime;
-                        PoolTimes.RemoveAt(j);
-                    }
-                    else if (PoolTimes[j].FromTime < PoolTimes[i].FromTime && PoolTimes[j].ToTime > PoolTimes[i].ToTime)
-                    {
-                        PoolTimes.RemoveAt(i);
-                    }
-                    else
-                    {
-                        j++;
-                    }
-                }
-                */
             }
             newArray.Reverse();
             PoolTimes = newArray;

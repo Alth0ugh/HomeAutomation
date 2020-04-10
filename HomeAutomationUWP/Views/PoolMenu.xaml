@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converters="using:HomeAutomationUWP.Converters"
     xmlns:controls="using:HomeAutomationUWP.Controls"
+    xmlns:iconPacks="using:MahApps.Metro.IconPacks"
     mc:Ignorable="d"
     x:Name="poolMenu"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -38,11 +39,18 @@
                     Command="{Binding OnOffCommand}"/>-->
             <CheckBox Content="Manual" IsChecked="{Binding ManualMode, Mode=TwoWay}"/>
             <ToggleSwitch Header="Power" IsOn="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=TwoWay}" IsEnabled="{Binding ManualMode}"/>
-            <Button Content="Refresh" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10"/>
+            <Button HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial Kind="Refresh" Margin="10"/>
+                    <TextBlock FontSize="22" Text="Refresh" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Content="+" Command="{Binding AddTimeCommand}"/>
+            <Button Command="{Binding AddTimeCommand}">
+                <iconPacks:PackIconMaterial Kind="Plus"/>
+            </Button>
         </StackPanel>
 
         <ScrollViewer Grid.Column="0" Grid.Row="1">
