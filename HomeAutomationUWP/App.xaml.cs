@@ -67,11 +67,11 @@ namespace HomeAutomationUWP
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(LightControl), e.Arguments);
+                    rootFrame.Navigate(typeof(AnyPage), e.Arguments);
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
-                Navigation.Navigation.Frame = rootFrame;
+                //Navigation.Navigation.Frame = rootFrame;
             }
         }
 

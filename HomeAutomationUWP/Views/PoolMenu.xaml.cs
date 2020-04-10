@@ -29,6 +29,7 @@ namespace HomeAutomationUWP.Views
         public PoolMenu()
         {
             DataContext = new PoolMenuModel();
+            NavigationCacheMode = NavigationCacheMode.Enabled;
             this.InitializeComponent();
         }
     }

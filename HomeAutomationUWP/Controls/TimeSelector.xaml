@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converters="using:HomeAutomationUWP.Converters"
+    xmlns:iconPacks="using:MahApps.Metro.IconPacks"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
@@ -23,6 +24,8 @@
         <TextBox x:Name="ToText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True" Text="{Binding To, Converter={StaticResource UShortToString}}"/>
         <Button x:Name="toIncrease" Content="+" Click="ChangeTime" VerticalAlignment="Center" Margin="0,0,2,0"/>
         <Button x:Name="toDecrease" Content="-" Click="ChangeTime" VerticalAlignment="Center" Margin="0,0,5,0"/>
-
+        <Button VerticalAlignment="Center" Margin="0,0,5,0" Command="{Binding DeleteEntry}" CommandParameter="{Binding}">
+            <iconPacks:PackIconMaterial Kind="Delete"/>
+        </Button>
     </StackPanel>
 </UserControl>

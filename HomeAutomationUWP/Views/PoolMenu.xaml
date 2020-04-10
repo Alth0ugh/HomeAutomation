@@ -7,17 +7,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converters="using:HomeAutomationUWP.Converters"
     xmlns:controls="using:HomeAutomationUWP.Controls"
+    xmlns:iconPacks="using:MahApps.Metro.IconPacks"
     mc:Ignorable="d"
     x:Name="poolMenu"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
         <converters:BoolToStringConverter x:Name="BoolToString"/>
-        <converters:BoolToOnOFfOpposite x:Name="BoolToOnOffOpposite"/>
         <converters:IntToStringConverter x:Name="IntToString"/>
         <converters:UShortToUShortConverter x:Name="UShortToUShort"/>
         <converters:UShortToString x:Name="UShortToString"/>
         <converters:StringToUShort x:Name="StringToUShort"/>
+        <converters:IntToOnOffConverter x:Name="IntToOnOff"/>
+        <converters:IntToOnOffOppositeConverter x:Name="IntToOnOffOpposite"/>
     </Page.Resources>
 
     <Grid>
@@ -31,13 +33,24 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
-            <TextBlock Text="{Binding PoolPower, Converter={StaticResource BoolToString}, Mode=OneWay}" VerticalAlignment="Center"/>
-            <Button Content="{Binding PoolPower, Converter={StaticResource BoolToOnOffOpposite}, Mode=OneWay}" Command="{Binding OnOffCommand}"/>
+            <!--<TextBlock Text="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=OneWay}" VerticalAlignment="Center"/>-->
+            <!--<Button x:Name="OnOffButton" 
+                    Content="{Binding PoolPower, Converter={StaticResource IntToOnOffOpposite}, Mode=OneWay}" 
+                    Command="{Binding OnOffCommand}"/>-->
+            <CheckBox Content="Manual" IsChecked="{Binding ManualMode, Mode=TwoWay}"/>
+            <ToggleSwitch Header="Power" IsOn="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=TwoWay}" IsEnabled="{Binding ManualMode}"/>
+            <Button HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial Kind="Refresh" Margin="10"/>
+                    <TextBlock FontSize="22" Text="Refresh" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Content="+" Command="{Binding AddTimeCommand}"/>
-            <Button Content="Serialize" Margin="10" Command="{Binding SerializeCommand}"/>
+            <Button Command="{Binding AddTimeCommand}">
+                <iconPacks:PackIconMaterial Kind="Plus"/>
+            </Button>
         </StackPanel>
 
         <ScrollViewer Grid.Column="0" Grid.Row="1">
@@ -45,7 +58,8 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"
-                                               To="{Binding ToTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
+                                               To="{Binding ToTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"
+                                               DeleteEntry="{Binding ElementName=poolMenu, Path=DataContext.DeleteTime }"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

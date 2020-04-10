@@ -5,10 +5,16 @@
     xmlns:local="using:HomeAutomationUWP.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:iconPacks="using:MahApps.Metro.IconPacks"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button Content="Pool" Height="100" Width="100" Command="{Binding Pool}"/>
+        <Button Height="100" Width="100" Command="{Binding Pool}" Margin="10">
+            <iconPacks:PackIconMaterial Kind="Pool" Width="80" Height="80"/>
+        </Button>
+        <Button Height="100" Width="100" Command="{Binding Light}" Margin="10">
+            <iconPacks:PackIconMaterial Kind="Lightbulb" Width="80" Height="80"/>
+        </Button>
     </StackPanel>
 </Page>

@@ -26,6 +26,7 @@ namespace HomeAutomationUWP.Views
         public LightControl()
         {
             DataContext = new LightControlModel();
+            NavigationCacheMode = NavigationCacheMode.Enabled;
             this.InitializeComponent();
         }
     }

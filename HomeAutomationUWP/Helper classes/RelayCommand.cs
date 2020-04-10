@@ -11,7 +11,6 @@ namespace HomeAutomationUWP.Helper_classes
         public RelayCommand(Action<object> execute)
         {
             _execute = execute;
-
         }
 
         public bool CanExecute(object parameter)

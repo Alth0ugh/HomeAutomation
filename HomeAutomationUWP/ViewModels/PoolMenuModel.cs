@@ -11,18 +11,27 @@ using System.Windows.Input;
 using HomeAutomationUWP.Controls;
 using Windows.UI.Xaml;
 using HomeAutomationUWP.Helper_classes;
+using HomeAutomationUWP.Helper_interfaces;
 using System.Runtime.Serialization.Json;
 using System.IO;
+using System.Net.Security;
+using System.Net.Sockets;
 using System.Threading;
+using System.Timers;
 using Windows.Storage.Streams;
+using System.Security.Cryptography.X509Certificates;
+using Windows.UI.Core;
 
 namespace HomeAutomationUWP.ViewModels
 {
-    public class PoolMenuModel : INotifyPropertyChanged
+    public class PoolMenuModel : BindableBase, INavigateBackAction, INavigateAction
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private bool _poolPower;
-        public bool PoolPower
+        private PoolControler _client;
+        private int _poolPower;
+        /// <summary>
+        /// Indicates the status of the pool. 1 - ON, 0 - OFF, -1 - ERROR
+        /// </summary>
+        public int PoolPower
         {
             get
             {
@@ -30,16 +39,51 @@ namespace HomeAutomationUWP.ViewModels
             }
             set
             {
+                if (_poolPower == -1)
+                {
+                    _poolPower = value;
+                    return;
+                }
+                if (value == 0)
+                {
+                    _client.TurnOff();
+                }
+                else if (value == 1)
+                {
+                    _client.TurnOn();
+                }
                 _poolPower = value;
                 NotifyPropertyChanged("PoolPower");
             }
         }
 
+        private bool _manualMode = false;
+        public bool ManualMode
+        {
+            get
+            {
+                return _manualMode;
+            }
+            set
+            {
+                _manualMode = value;
+                PoolChecker.SetManualMode(_manualMode);
+                NotifyPropertyChanged("ManualMode");
+            }
+        }
+
         private ObservableCollection<TimeSelectorCharacteristic> _listOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>();
+        /// <summary>
+        /// Lists the times when the pool should be on.
+        /// </summary>
         public ObservableCollection<TimeSelectorCharacteristic> ListOfTimeSelectors
         {
             get
             {
+                if (_listOfTimeSelectors == null)
+                {
+                    return new ObservableCollection<TimeSelectorCharacteristic>();
+                }
                 return _listOfTimeSelectors;
             }
             set
@@ -49,138 +93,74 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        private ushort _fromTime = 1;
-        public ushort FromTime
-        {
-            get
-            {
-                return _fromTime;
-            }
-            set
-            {
-                _fromTime = value;
-                Debug.WriteLine("FromTime changed: " + value);
-                NotifyPropertyChanged("FromTime");
-            }
-        }
-
         public ICommand OnOffCommand { get; set; }
         public ICommand AddTimeCommand { get; set; }
         public ICommand SerializeCommand { get; set; }
-
+        public ICommand ReconnectCommand { get; set; }
+        private ICommand _deleteTime = new RelayCommand(new Action<object>(o => { Debug.WriteLine("Este nie"); }));
+        public ICommand DeleteTime { get => _deleteTime; set => _deleteTime = value; }
+        
         public PoolMenuModel()
         {
-            PoolPower = false;
+            PoolPower = -1;
 
             SetCommands();
+            /*
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 1, ToTime = 3 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 4, ToTime = 5 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 2, ToTime = 8 });
             ListOfTimeSelectors.Add(new TimeSelectorCharacteristic() { FromTime = 3, ToTime = 4 });
+            */
+            _client = PoolChecker.PoolClient;
+            _client.OnConnected += new ESP8266.OnConnectedHandler(OnESPConnected);
+            _client.OnDisconnected += new ESP8266.OnDisconnectedHandler(OnESPDisconnected);
+            ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>(PoolChecker.PoolTimes);
+            PoolChecker.OnPoolStateChanged += new PoolChecker.OnPoolStateChangedEventHandler(UpdatePoolState);
+            UpdatePoolState();
+        }
+
+        private void UpdatePoolState()
+        {
+            PoolPower = PoolChecker.PoolPower;
+        }
+
+        private void OnESPDisconnected()
+        {
+            PoolPower = -1;
+        }
+
+        private void ReconnectESP(object obj)
+        {
+            if (_client == null)
+            {
+                return;
+            }
+            Task.Run(new Action(_client.Listen));
+        }
+
+        private async void OnESPConnected()
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                try
+                {
+                    PoolPower = await _client.GetPoolStatus();
+                }
+                catch { }
+            });
         }
 
         private void SetCommands()
         {
-            OnOffCommand = new RelayCommand(SetESPStatus);
+            OnOffCommand = new AsyncRelayCommand(PoolChecker.SetESPStatus);
             AddTimeCommand = new RelayCommand(AddTimeEntry);
-            SerializeCommand = new RelayCommand(Serialize);
+            ReconnectCommand = new RelayCommand(ReconnectESP);
+            DeleteTime = new RelayCommand(DeleteTimeEntry);
         }
 
-        /// <summary>
-        /// Serializes the time intervals and saves the data int a file.
-        /// </summary>
-        /// <param name="obj"></param>
-        private async void Serialize(object obj)
+        public void DeleteTimeEntry(object sender)
         {
-            ConvertIntervals();
-            Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-            Windows.Storage.StorageFile file = await storageFolder.CreateFileAsync("test.txt", Windows.Storage.CreationCollisionOption.ReplaceExisting);
-            var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
-            var serializer = new DataContractJsonSerializer(typeof(ObservableCollection<TimeSelectorCharacteristic>));
-            var memoryStream = new MemoryStream();
-            serializer.WriteObject(stream.GetOutputStreamAt(0).AsStreamForWrite(), ListOfTimeSelectors);
-            memoryStream.Position = 0;
-            var reader = new StreamReader(memoryStream);
-            stream.Dispose();
-            Debug.WriteLine(reader.ReadToEnd());
-            /*Task.Run(() =>
-            {
-                var fileStream = new FileStream((Windows.ApplicationModel.Package.Current.InstalledLocation)., FileMode.Create);
-                memoryStream.WriteTo(fileStream);
-            });*/
-        }
-
-        /// <summary>
-        /// Sorts intervals.
-        /// </summary>
-        /// <returns>Sorted list.</returns>
-        private ObservableCollection<TimeSelectorCharacteristic> SortIntervals()
-        {
-            List<TimeSelectorCharacteristic> sorted = ListOfTimeSelectors.OrderBy(o => o.FromTime).ToList();
-            ObservableCollection<TimeSelectorCharacteristic> newArray = new ObservableCollection<TimeSelectorCharacteristic>();
-
-            foreach (var item in sorted)
-            {
-                newArray.Add(item);
-            }
-            return newArray;
-        }
-
-        /// <summary>
-        /// Merges overlapping intervals.
-        /// </summary>
-        private void ConvertIntervals()
-        {
-            var oldArray = SortIntervals();
-            ObservableCollection<TimeSelectorCharacteristic> newArray = new ObservableCollection<TimeSelectorCharacteristic>();
-            if (oldArray.Count == 0)
-            {
-                return;
-            }
-
-            newArray.Add(oldArray[0]);
-            for (int i = 1; i < ListOfTimeSelectors.Count; i++)
-            {
-                var top = newArray[0];
-                if (oldArray[i].FromTime > top.ToTime)
-                {
-                    newArray.Insert(0, oldArray[i]);
-                }
-                else if (oldArray[i].ToTime > top.ToTime)
-                {
-                    top.ToTime = oldArray[i].ToTime;
-                }
-                /*
-                int j = i + 1;
-                //for (int j = i + 1; j < ListOfTimeSelectors.Count; j++)
-                while(j < ListOfTimeSelectors.Count)
-                {
-                    if (ListOfTimeSelectors[j].FromTime == ListOfTimeSelectors[i].FromTime && ListOfTimeSelectors[j].ToTime == ListOfTimeSelectors[i].ToTime)
-                    {
-                        ListOfTimeSelectors.RemoveAt(j);
-                    }
-                    else if (ListOfTimeSelectors[j].FromTime <= ListOfTimeSelectors[i].FromTime && ListOfTimeSelectors[j].ToTime >= ListOfTimeSelectors[i].FromTime)
-                    {
-                        ListOfTimeSelectors[i].FromTime = ListOfTimeSelectors[j].FromTime;
-                        ListOfTimeSelectors.RemoveAt(j);
-                    }
-                    else if (ListOfTimeSelectors[j].ToTime >= ListOfTimeSelectors[i].ToTime && ListOfTimeSelectors[j].FromTime <= ListOfTimeSelectors[i].ToTime)
-                    {
-                        ListOfTimeSelectors[i].ToTime = ListOfTimeSelectors[j].ToTime;
-                        ListOfTimeSelectors.RemoveAt(j);
-                    }
-                    else if (ListOfTimeSelectors[j].FromTime < ListOfTimeSelectors[i].FromTime && ListOfTimeSelectors[j].ToTime > ListOfTimeSelectors[i].ToTime)
-                    {
-                        ListOfTimeSelectors.RemoveAt(i);
-                    }
-                    else
-                    {
-                        j++;
-                    }
-                }
-                */
-            }
-            ListOfTimeSelectors = newArray;
+            Debug.WriteLine("VM");
         }
 
         /// <summary>
@@ -189,27 +169,20 @@ namespace HomeAutomationUWP.ViewModels
         /// <param name="obj"></param>
         private void AddTimeEntry(object obj)
         {
-            ListOfTimeSelectors.Add(new TimeSelectorCharacteristic());
+            var newTime = new TimeSelectorCharacteristic();
+            ListOfTimeSelectors.Add(newTime);
+            PoolChecker.PoolTimes.Add(newTime);
         }
 
-        private void SetESPStatus(object obj)
+        public void OnNavigateBackAction(object obj)
         {
-            if (PoolPower)
-            {
-                PoolPower = false;
-            }
-            else
-            {
-                PoolPower = true;
-            }
+            Debug.WriteLine("serializing");
+            PoolChecker.Serialize(null);
         }
 
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        public void NavigatedTo()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            ListOfTimeSelectors = new ObservableCollection<TimeSelectorCharacteristic>(PoolChecker.PoolTimes);
         }
     }
 }
