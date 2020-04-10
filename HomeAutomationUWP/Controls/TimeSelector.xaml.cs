@@ -18,12 +18,14 @@ using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
+using System.Windows.Input;
+using HomeAutomationUWP.Helper_classes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace HomeAutomationUWP.Controls
 {
-    public sealed partial class TimeSelector : UserControl
+    public sealed partial class TimeSelector : UserControl, INotifyPropertyChanged
     {
         public TimeSelector()
         {
@@ -34,14 +36,16 @@ namespace HomeAutomationUWP.Controls
             toIncrease.Tag = new ButtonTag(ButtonTypes.ToTimeChange);
             toDecrease.Tag = new ButtonTag(ButtonTypes.ToTimeChange);
 
-            //From = (ushort)0;
-            //To = (ushort)5;
-
             stackPanel.DataContext = this;
         }
 
         public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)0));
         public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register(nameof(To), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)5));
+
+        public TimeSelectorCharacteristic CurrentCharacteristic { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ushort From
         {
             get
@@ -53,13 +57,10 @@ namespace HomeAutomationUWP.Controls
                 if (value <= 24 && value >= 1 && value < To)
                 {
                     SetValue(FromProperty, value);
-                    Debug.Write(value);
-                    //FromText.Text = GetValue(FromProperty).ToString();
                 }
                 else
                 {
                     SetValue(FromProperty, (ushort)0);
-                    //FromText.Text = GetValue(FromProperty).ToString();
                 }
             }
         }
@@ -83,6 +84,24 @@ namespace HomeAutomationUWP.Controls
                 }
             }
         }
+
+        public static readonly DependencyProperty DeleteProperty = DependencyProperty.Register(nameof(DeleteEntry), typeof(ICommand), typeof(TimeSelector), PropertyMetadata.Create(new RelayCommand(new Action<object>(o => { Debug.WriteLine("Delete"); }))));
+        private ICommand _deleteProperty = new RelayCommand(new Action<object>(o => { Debug.WriteLine("Delete"); }));
+        public ICommand DeleteEntry
+        {
+            get
+            {
+                return (ICommand)GetValue(DeleteProperty);
+                //return _deleteProperty;
+            }
+            set
+            {
+                SetValue(DeleteProperty, value);
+                //_deleteProperty = value;
+                NotifyPropertyChanged("DeleteEntry");
+            }
+        }
+
 
         /// <summary>
         /// Changes value in textblocks.
@@ -139,6 +158,11 @@ namespace HomeAutomationUWP.Controls
                         break;
                 }
             }
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 

@@ -97,7 +97,9 @@ namespace HomeAutomationUWP.ViewModels
         public ICommand AddTimeCommand { get; set; }
         public ICommand SerializeCommand { get; set; }
         public ICommand ReconnectCommand { get; set; }
-
+        private ICommand _deleteTime = new RelayCommand(new Action<object>(o => { Debug.WriteLine("Este nie"); }));
+        public ICommand DeleteTime { get => _deleteTime; set => _deleteTime = value; }
+        
         public PoolMenuModel()
         {
             PoolPower = -1;
@@ -153,9 +155,14 @@ namespace HomeAutomationUWP.ViewModels
             OnOffCommand = new AsyncRelayCommand(PoolChecker.SetESPStatus);
             AddTimeCommand = new RelayCommand(AddTimeEntry);
             ReconnectCommand = new RelayCommand(ReconnectESP);
+            DeleteTime = new RelayCommand(DeleteTimeEntry);
         }
 
-        
+        public void DeleteTimeEntry(object sender)
+        {
+            Debug.WriteLine("VM");
+        }
+
         /// <summary>
         /// Adds an interval to collection.
         /// </summary>

@@ -58,7 +58,8 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"
-                                               To="{Binding ToTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
+                                               To="{Binding ToTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"
+                                               DeleteEntry="{Binding ElementName=poolMenu, Path=DataContext.DeleteTime }"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
