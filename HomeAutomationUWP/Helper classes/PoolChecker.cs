@@ -83,7 +83,6 @@ namespace HomeAutomationUWP.Helper_classes
         /// </summary>
         private static void ConvertIntervals()
         {
-            
             var oldArray = SortIntervals();
             List<TimeSelectorCharacteristic> newArray = new List<TimeSelectorCharacteristic>();
             if (oldArray.Count == 0)
@@ -121,6 +120,7 @@ namespace HomeAutomationUWP.Helper_classes
                 return new List<TimeSelectorCharacteristic>();
             }
             var file = await storageFolder.OpenStreamForReadAsync("test.txt");
+            file.Position = 0;
 
             var serializer = new DataContractJsonSerializer(typeof(List<TimeSelectorCharacteristic>));
             return (List<TimeSelectorCharacteristic>)serializer.ReadObject(file);

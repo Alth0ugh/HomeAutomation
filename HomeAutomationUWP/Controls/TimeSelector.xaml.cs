@@ -20,6 +20,7 @@ using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
 using System.Windows.Input;
 using HomeAutomationUWP.Helper_classes;
+using MahApps.Metro.IconPacks;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -42,7 +43,7 @@ namespace HomeAutomationUWP.Controls
         public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)0));
         public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register(nameof(To), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)5));
 
-        public static readonly DependencyProperty CurrentCharacteristicDependencyProperty = DependencyProperty.Register(nameof(CurrentCharacteristic), typeof(TimeSelectorCharacteristic), typeof(TimeSelector), PropertyMetadata.Create(new TimeSelectorCharacteristic() { FromTime = 0, ToTime = 1 },new PropertyChangedCallback(SetValues)));
+        public static readonly DependencyProperty CurrentCharacteristicDependencyProperty = DependencyProperty.Register(nameof(CurrentCharacteristic), typeof(TimeSelectorCharacteristic), typeof(TimeSelector), PropertyMetadata.Create(new TimeSelectorCharacteristic() { FromTime = 0, ToTime = 1 }, new PropertyChangedCallback(SetValues)));
         public TimeSelectorCharacteristic CurrentCharacteristic
         {
             get
@@ -113,7 +114,7 @@ namespace HomeAutomationUWP.Controls
             }
         }
 
-        public static readonly DependencyProperty DeleteProperty = DependencyProperty.Register(nameof(DeleteEntry), typeof(ICommand), typeof(TimeSelector), PropertyMetadata.Create(new RelayCommand(new Action<object>(o => {  }))));
+        public static readonly DependencyProperty DeleteProperty = DependencyProperty.Register(nameof(DeleteEntry), typeof(ICommand), typeof(TimeSelector), PropertyMetadata.Create(new RelayCommand(new Action<object>(o => { }))));
         public ICommand DeleteEntry
         {
             get
@@ -139,11 +140,11 @@ namespace HomeAutomationUWP.Controls
 
             if (button != null)
             {
-                string buttonContent;
+                PackIconMaterial buttonContent;
                 ButtonTypes buttonType;
-                if (button.Content is string)
+                if (button.Content is PackIconMaterial)
                 {
-                    buttonContent = (string)button.Content;
+                    buttonContent = (PackIconMaterial)button.Content;
                 }
                 else
                 {
@@ -162,22 +163,26 @@ namespace HomeAutomationUWP.Controls
                 switch (buttonType)
                 {
                     case ButtonTypes.FromTimeChange:
-                        if (buttonContent == "+")
+                        if (buttonContent.Kind == PackIconMaterialKind.Plus)
                         {
                             From++;
+                            CurrentCharacteristic.FromTime++;
                         }
                         else
                         {
+                            CurrentCharacteristic.FromTime--;
                             From--;
                         }
                         break;
                     case ButtonTypes.ToTimeChange:
-                        if (buttonContent == "+")
+                        if (buttonContent.Kind == PackIconMaterialKind.Plus)
                         {
+                            CurrentCharacteristic.ToTime++;
                             To++;
                         }
                         else
                         {
+                            CurrentCharacteristic.ToTime--;
                             To--;
                         }
                         break;

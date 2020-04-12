@@ -165,6 +165,7 @@ namespace HomeAutomationUWP.ViewModels
             if (characteristic != null)
             {
                 ListOfTimeSelectors.Remove(characteristic);
+                PoolChecker.PoolTimes.Remove(characteristic);
             }
         }
 

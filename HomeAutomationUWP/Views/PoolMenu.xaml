@@ -58,7 +58,8 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <controls:TimeSelector DeleteEntry="{Binding ElementName=poolMenu, Path=DataContext.DeleteTime }"
-                                               CurrentCharacteristic="{Binding}"/>
+                                               CurrentCharacteristic="{Binding}"
+                                               Margin="0,0,0,10"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
