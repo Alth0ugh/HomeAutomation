@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using HomeAutomationUWP.Controls;
+using Newtonsoft.Json;
 
 namespace HomeAutomationUWP.Helper_classes
 {
@@ -60,13 +61,13 @@ namespace HomeAutomationUWP.Helper_classes
 
             var serializer = new DataContractJsonSerializer(typeof(List<TimeSelectorCharacteristic>));
 
-            using (var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite))
-            {
-                using (var outputStream = stream.GetOutputStreamAt(0))
-                {
-                    serializer.WriteObject(outputStream.AsStreamForWrite(), PoolTimes);
-                }
-            }
+            var jsonString = JsonConvert.SerializeObject(PoolTimes);
+            var data = Encoding.ASCII.GetBytes(jsonString);
+            var openedFile = await file.OpenStreamForWriteAsync();
+            openedFile.Flush();
+            openedFile.Write(data, 0, data.Length);
+            openedFile.Close();
+            openedFile.Dispose();
         }
 
         /// <summary>
@@ -120,10 +121,20 @@ namespace HomeAutomationUWP.Helper_classes
                 return new List<TimeSelectorCharacteristic>();
             }
             var file = await storageFolder.OpenStreamForReadAsync("test.txt");
-            file.Position = 0;
+            string json = string.Empty;
 
-            var serializer = new DataContractJsonSerializer(typeof(List<TimeSelectorCharacteristic>));
-            return (List<TimeSelectorCharacteristic>)serializer.ReadObject(file);
+            for (int i = 0; i < file.Length; i++)
+            {
+                json += (char)file.ReadByte();
+            }
+
+            var data = JsonConvert.DeserializeObject<List<TimeSelectorCharacteristic>>(json);
+
+            if (data != null)
+            {
+                return (List<TimeSelectorCharacteristic>)data;
+            }
+            return new List<TimeSelectorCharacteristic>();
         }
 
 
