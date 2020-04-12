@@ -40,10 +40,7 @@ namespace HomeAutomationUWP.Controls
             stackPanel.DataContext = this;
         }
 
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register(nameof(From), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)0));
-        public static readonly DependencyProperty ToDependencyProperty = DependencyProperty.Register(nameof(To), typeof(ushort), typeof(TimeSelector), PropertyMetadata.Create((ushort)5));
-
-        public static readonly DependencyProperty CurrentCharacteristicDependencyProperty = DependencyProperty.Register(nameof(CurrentCharacteristic), typeof(TimeSelectorCharacteristic), typeof(TimeSelector), PropertyMetadata.Create(new TimeSelectorCharacteristic() { FromTime = 0, ToTime = 1 }, new PropertyChangedCallback(SetValues)));
+        public static readonly DependencyProperty CurrentCharacteristicDependencyProperty = DependencyProperty.Register(nameof(CurrentCharacteristic), typeof(TimeSelectorCharacteristic), typeof(TimeSelector), PropertyMetadata.Create(new TimeSelectorCharacteristic() { FromTime = 0, ToTime = 1 }));
         public TimeSelectorCharacteristic CurrentCharacteristic
         {
             get
@@ -53,67 +50,11 @@ namespace HomeAutomationUWP.Controls
             set
             {
                 SetValue(CurrentCharacteristicDependencyProperty, value);
-                SetValues(null, null);
+                NotifyPropertyChanged("CurrentCharacteristic");
             }
         }
-
-        private static void SetValues(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-        {
-            var characteristic = e.NewValue as TimeSelectorCharacteristic;
-            var selector = obj as TimeSelector;
-            if (characteristic != null && selector != null)
-            {
-                selector.To = characteristic.ToTime;
-                selector.From = characteristic.FromTime;
-            }
-            else
-            {
-                selector.From = 0;
-                selector.To = 1;
-            }
-        }
-
+       
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public ushort From
-        {
-            get
-            {
-                return (ushort)GetValue(FromProperty);
-            }
-            set
-            {
-                if (value <= 24 && value >= 1 && value < To)
-                {
-                    SetValue(FromProperty, value);
-                }
-                else
-                {
-                    SetValue(FromProperty, (ushort)0);
-                }
-            }
-        }
-        public ushort To
-        {
-            get
-            {
-                return (ushort)GetValue(ToDependencyProperty);
-            }
-            set
-            {
-                if (value <= 24 && value >= 1 && value > From)
-                {
-                    SetValue(ToDependencyProperty, value);
-                    ToText.Text = GetValue(ToDependencyProperty).ToString();
-                }
-                else
-                {
-                    SetValue(ToDependencyProperty, (ushort)1);
-                    ToText.Text = GetValue(ToDependencyProperty).ToString();
-                }
-            }
-        }
-
         public static readonly DependencyProperty DeleteProperty = DependencyProperty.Register(nameof(DeleteEntry), typeof(ICommand), typeof(TimeSelector), PropertyMetadata.Create(new RelayCommand(new Action<object>(o => { }))));
         public ICommand DeleteEntry
         {
@@ -165,25 +106,37 @@ namespace HomeAutomationUWP.Controls
                     case ButtonTypes.FromTimeChange:
                         if (buttonContent.Kind == PackIconMaterialKind.Plus)
                         {
-                            From++;
-                            CurrentCharacteristic.FromTime++;
+                            if (CurrentCharacteristic.FromTime + 1 >= CurrentCharacteristic.ToTime)
+                            {
+                                CurrentCharacteristic.FromTime = 0;
+                            }
+                            else
+                            {
+                                CurrentCharacteristic.FromTime++;
+                            }
                         }
                         else
                         {
-                            CurrentCharacteristic.FromTime--;
-                            From--;
+                            if (CurrentCharacteristic.FromTime > 0)
+                            {
+                                CurrentCharacteristic.FromTime--;
+                            }
                         }
                         break;
                     case ButtonTypes.ToTimeChange:
                         if (buttonContent.Kind == PackIconMaterialKind.Plus)
                         {
-                            CurrentCharacteristic.ToTime++;
-                            To++;
+                            if (CurrentCharacteristic.ToTime < 24)
+                            {
+                                CurrentCharacteristic.ToTime++;
+                            }
                         }
                         else
                         {
-                            CurrentCharacteristic.ToTime--;
-                            To--;
+                            if (CurrentCharacteristic.ToTime - 1 > CurrentCharacteristic.FromTime)
+                            {
+                                CurrentCharacteristic.ToTime--;
+                            }
                         }
                         break;
                 }

@@ -17,7 +17,7 @@
     
     <StackPanel Orientation="Horizontal" x:Name="stackPanel">
         <TextBlock Text="Od" VerticalAlignment="Center" Margin="5"/>
-        <TextBox x:Name="FromText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True" Text="{Binding From, Converter={StaticResource UShortToString}}"/>
+        <TextBox x:Name="FromText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True" Text="{Binding CurrentCharacteristic.FromTime, Converter={StaticResource UShortToString}}"/>
         <Button x:Name="fromDecrease" Click="ChangeTime" VerticalAlignment="Center" Margin="0,0,5,0">
             <iconPacks:PackIconMaterial Kind="Minus"/>
         </Button>
@@ -25,7 +25,7 @@
             <iconPacks:PackIconMaterial Kind="Plus"/>
         </Button>
         <TextBlock VerticalAlignment="Center" Margin="0,0,5,0" Text="do"/>
-        <TextBox x:Name="ToText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True" Text="{Binding To, Converter={StaticResource UShortToString}}"/>
+        <TextBox x:Name="ToText" VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True" Text="{Binding CurrentCharacteristic.ToTime, Mode=OneWay, Converter={StaticResource UShortToString}}"/>
         <Button x:Name="toDecrease" Click="ChangeTime" VerticalAlignment="Center" Margin="0,0,5,0">
             <iconPacks:PackIconMaterial Kind="Minus"/>
         </Button>
