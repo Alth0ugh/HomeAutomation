@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using HomeAutomationUWP.Helper_classes;
 using HomeAutomationUWP.Loggers;
+using HomeAutomationUWP.Helper_interfaces;
 
 namespace HomeAutomationUWP.ViewModels
 {
-    public class LightControlModel : BindableBase
+    public class LightControlModel : BindableBase, INavigateAction
     {
         private double _colorTemperature = 2700;
         public double ColorTemperature
@@ -233,19 +234,37 @@ namespace HomeAutomationUWP.ViewModels
 
         private async void ConnectToLight(object obj)
         {
-            var deviceCharacteristic = obj as YeelightDeviceCharacteristic;
-            if (deviceCharacteristic == null)
+            object previousCharacteristic = null;
+            if (obj is Task<YeelightDeviceCharacteristic>)
             {
-                return;
-            }
+                previousCharacteristic = await (obj as Task<YeelightDeviceCharacteristic>);
+                var onlineDevices = await YeelightDevice.FindDevices();
+                YeelightDeviceCharacteristic editedCharacteristic;
 
-            ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
-            ConnectedDevice.SetPower(true);
-            _brightness = deviceCharacteristic.Brightness;
-            NotifyPropertyChanged("Brightness");
-            _colorTemperature = deviceCharacteristic.ColorTemperature;
-            NotifyPropertyChanged("ColorTemperature");
-            await ConfigLogger.Log(ConfigType.LightConfig, deviceCharacteristic);
+                if (onlineDevices.Exists(o => o.IpAddress == ((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress))
+                {
+                    var device = onlineDevices.Find(o => o.IpAddress == ((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress);
+                    editedCharacteristic = new YeelightDeviceCharacteristic(((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress, device.Port, device.AvaliableMethods);
+                    ConnectedDevice = await YeelightDevice.Connect(editedCharacteristic);
+                    ConnectedDevice.SetPower(true);
+                    _brightness = device.Brightness;
+                    NotifyPropertyChanged("Brightness");
+                    _colorTemperature = device.ColorTemperature;
+                    NotifyPropertyChanged("ColorTemperature");
+                }
+            }
+            else if (obj is YeelightDeviceCharacteristic)
+            {
+                var deviceCharacteristic = obj as YeelightDeviceCharacteristic;
+
+                ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
+                ConnectedDevice.SetPower(true);
+                _brightness = deviceCharacteristic.Brightness;
+                NotifyPropertyChanged("Brightness");
+                _colorTemperature = deviceCharacteristic.ColorTemperature;
+                NotifyPropertyChanged("ColorTemperature");
+                await ConfigLogger.Log(ConfigType.LightConfig, deviceCharacteristic);
+            }
         }
 
         private async void OpenDeviceSelector(object obj)
@@ -263,6 +282,11 @@ namespace HomeAutomationUWP.ViewModels
         private void SearchForDevices(object obj)
         {
             IsSearching = IsSearching ? false : true;
+        }
+
+        public void NavigatedTo()
+        {
+            ConnectToLight(ConfigReader.ReadEntireConfigAsync<YeelightDeviceCharacteristic>(ConfigType.LightConfig));
         }
     }
 }

@@ -12,13 +12,14 @@ using System.Runtime.Serialization;
 using System.IO;
 using System.Diagnostics;
 using Windows.UI.Xaml.Input;
+using Newtonsoft.Json;
 
 namespace HomeAutomationUWP.Helper_classes
 {
     public class YeelightDevice
     {
         private static IPEndPoint _remoteEndPoint = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1982);
-        private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.116"), 1901);
+        private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.118"), 1901);
         private TcpClient _tcpClient = new TcpClient();
         private Random _random = new Random();
         private DataContractJsonSerializer _serializer = new DataContractJsonSerializer(typeof(YeelightCommand));
@@ -149,6 +150,8 @@ namespace HomeAutomationUWP.Helper_classes
             {
                 return;
             }
+
+            DeviceCharacteristic.ColorTemperature = value;
             SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
         }
 
@@ -163,6 +166,7 @@ namespace HomeAutomationUWP.Helper_classes
                 return;
             }
 
+            DeviceCharacteristic.Brightness = value;
             SendCommand(new YeelightCommand(_random.Next(1, 100), "set_bright", value, "sudden", 0));
         }
 
@@ -241,12 +245,12 @@ namespace HomeAutomationUWP.Helper_classes
         }
     }   
 
-    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class YeelightDeviceCharacteristic : BindableBase
     {
-        [DataMember]
+        [JsonProperty]
         public string IpAddress { get; }
-        [DataMember]
+        [JsonProperty]
         public int Port { get; }
         public List<string> AvaliableMethods { get; }
         private Visibility _connectButtonVisibility;
