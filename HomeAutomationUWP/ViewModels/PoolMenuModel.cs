@@ -97,8 +97,7 @@ namespace HomeAutomationUWP.ViewModels
         public ICommand AddTimeCommand { get; set; }
         public ICommand SerializeCommand { get; set; }
         public ICommand ReconnectCommand { get; set; }
-        private ICommand _deleteTime = new RelayCommand(new Action<object>(o => { Debug.WriteLine("Este nie"); }));
-        public ICommand DeleteTime { get => _deleteTime; set => _deleteTime = value; }
+        public ICommand DeleteTime { get; set; }
         
         public PoolMenuModel()
         {
