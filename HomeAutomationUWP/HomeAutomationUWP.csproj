@@ -143,6 +143,8 @@
     <Compile Include="Helper classes\YeelightDevice.cs" />
     <Compile Include="Helper interfaces\IBackAction.cs" />
     <Compile Include="Helper interfaces\INavigateAction.cs" />
+    <Compile Include="Loggers\ConfigLogger.cs" />
+    <Compile Include="Loggers\ConfigReader.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -237,6 +239,9 @@
     <SDKReference Include="WindowsIoT, Version=10.0.17134.0">
       <Name>Windows IoT Extensions for the UWP</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Logger interfaces\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

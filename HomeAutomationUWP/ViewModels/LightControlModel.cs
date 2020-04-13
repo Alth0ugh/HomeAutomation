@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using HomeAutomationUWP.Helper_classes;
+using HomeAutomationUWP.Loggers;
 
 namespace HomeAutomationUWP.ViewModels
 {
@@ -244,7 +245,7 @@ namespace HomeAutomationUWP.ViewModels
             NotifyPropertyChanged("Brightness");
             _colorTemperature = deviceCharacteristic.ColorTemperature;
             NotifyPropertyChanged("ColorTemperature");
-            //ConnectingState = ConnectedDevice.Connected ? (ushort)1 : (ushort)2;
+            await ConfigLogger.Log(ConfigType.LightConfig, deviceCharacteristic);
         }
 
         private async void OpenDeviceSelector(object obj)
