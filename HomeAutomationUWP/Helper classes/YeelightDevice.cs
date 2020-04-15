@@ -19,7 +19,7 @@ namespace HomeAutomationUWP.Helper_classes
     public class YeelightDevice
     {
         private static IPEndPoint _remoteEndPoint = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1982);
-        private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.118"), 1901);
+        private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.117"), 1901);
         private TcpClient _tcpClient = new TcpClient();
         private Random _random = new Random();
         private DataContractJsonSerializer _serializer = new DataContractJsonSerializer(typeof(YeelightCommand));
@@ -46,22 +46,22 @@ namespace HomeAutomationUWP.Helper_classes
         /// <returns>List of device characteristics.</returns>
         public async static Task<List<YeelightDeviceCharacteristic>> FindDevices()
         {
-            var _udpclient = new UdpClient();
+            var _udpClient = new UdpClient();
             List<YeelightDeviceCharacteristic> _foundDevices = new List<YeelightDeviceCharacteristic>();
             // The following three lines allow multiple clients on the same PC
-            _udpclient.ExclusiveAddressUse = false;
-            _udpclient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _udpclient.ExclusiveAddressUse = false;
+            _udpClient.ExclusiveAddressUse = false;
+            _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _udpClient.ExclusiveAddressUse = false;
             // Bind, Join
-            _udpclient.Client.Bind(_localEndPoint);
-            _udpclient.JoinMulticastGroup(_remoteEndPoint.Address, _localEndPoint.Address);
+            _udpClient.Client.Bind(_localEndPoint);
+            _udpClient.JoinMulticastGroup(_remoteEndPoint.Address, _localEndPoint.Address);
 
             var bufferToSend = Encoding.UTF8.GetBytes("M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1982\r\nMAN: \"ssdp:discover\"\r\nST: wifi_bulb\r\n");
-            await _udpclient.SendAsync(bufferToSend, bufferToSend.Length, _remoteEndPoint);
+            await _udpClient.SendAsync(bufferToSend, bufferToSend.Length, _remoteEndPoint);
 
-            while (_udpclient.Available > 0)
+            while (_udpClient.Available > 0)
             {
-                var buffer = (await _udpclient.ReceiveAsync()).Buffer;
+                var buffer = (await _udpClient.ReceiveAsync()).Buffer;
                 string message = string.Empty;
                 foreach (var character in buffer)
                 {
@@ -70,6 +70,8 @@ namespace HomeAutomationUWP.Helper_classes
                 _foundDevices.Add(GetDeviceCharacteristic(message));
             }
 
+            _udpClient.Close();
+            _udpClient.Dispose();
             return _foundDevices;
         }
 

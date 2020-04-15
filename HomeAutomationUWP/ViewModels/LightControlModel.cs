@@ -234,7 +234,7 @@ namespace HomeAutomationUWP.ViewModels
 
         private async void ConnectToLight(object obj)
         {
-            object previousCharacteristic = null;
+                /*
             if (obj is Task<YeelightDeviceCharacteristic>)
             {
                 previousCharacteristic = await (obj as Task<YeelightDeviceCharacteristic>);
@@ -246,20 +246,26 @@ namespace HomeAutomationUWP.ViewModels
                     var device = onlineDevices.Find(o => o.IpAddress == ((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress);
                     editedCharacteristic = new YeelightDeviceCharacteristic(((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress, device.Port, device.AvaliableMethods);
                     ConnectedDevice = await YeelightDevice.Connect(editedCharacteristic);
-                    ConnectedDevice.SetPower(true);
                     _brightness = device.Brightness;
                     NotifyPropertyChanged("Brightness");
                     _colorTemperature = device.ColorTemperature;
                     NotifyPropertyChanged("ColorTemperature");
                 }
             }
-            else if (obj is YeelightDeviceCharacteristic)
+            */
+            if (obj is YeelightDeviceCharacteristic)
             {
                 var deviceCharacteristic = obj as YeelightDeviceCharacteristic;
 
                 ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
-                ConnectedDevice.SetPower(true);
-                _brightness = deviceCharacteristic.Brightness;
+                if (ConnectedDevice.DeviceCharacteristic.Power == "on")
+                {
+                    _brightness = deviceCharacteristic.Brightness;
+                }
+                else
+                {
+                    _brightness = 0;
+                }
                 NotifyPropertyChanged("Brightness");
                 _colorTemperature = deviceCharacteristic.ColorTemperature;
                 NotifyPropertyChanged("ColorTemperature");
@@ -284,9 +290,20 @@ namespace HomeAutomationUWP.ViewModels
             IsSearching = IsSearching ? false : true;
         }
 
-        public void NavigatedTo()
+        public async void NavigatedTo()
         {
-            ConnectToLight(ConfigReader.ReadEntireConfigAsync<YeelightDeviceCharacteristic>(ConfigType.LightConfig));
+            var onlineDevices = await YeelightDevice.FindDevices();
+            var previousCharacteristic = await ConfigReader.ReadEntireConfigAsync<YeelightDeviceCharacteristic>(ConfigType.LightConfig);
+
+            if (previousCharacteristic == null)
+            {
+                return;
+            }
+
+            if (onlineDevices.Exists(o => o.IpAddress == previousCharacteristic.IpAddress))
+            {
+                ConnectToLight(onlineDevices.Find(o => o.IpAddress == previousCharacteristic.IpAddress));
+            }
         }
     }
 }
