@@ -14,6 +14,8 @@ using System.Diagnostics;
 using Windows.UI.Xaml.Input;
 using Newtonsoft.Json;
 using HomeAutomationUWP.ViewModels;
+using Windows.Networking.Sockets;
+using System.Threading;
 
 namespace HomeAutomationUWP.Helper_classes
 {
@@ -60,6 +62,8 @@ namespace HomeAutomationUWP.Helper_classes
             var bufferToSend = Encoding.UTF8.GetBytes("M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1982\r\nMAN: \"ssdp:discover\"\r\nST: wifi_bulb\r\n");
             await _udpClient.SendAsync(bufferToSend, bufferToSend.Length, _remoteEndPoint);
 
+            Thread.Sleep(50);
+            
             while (_udpClient.Available > 0)
             {
                 var buffer = (await _udpClient.ReceiveAsync()).Buffer;
@@ -73,6 +77,13 @@ namespace HomeAutomationUWP.Helper_classes
 
             _udpClient.Close();
             _udpClient.Dispose();
+            /*
+            List<YeelightDeviceCharacteristic> _foundDevices = new List<YeelightDeviceCharacteristic>();
+            var socket = new DatagramSocket();
+            await socket.BindEndpointAsync(new Windows.Networking.HostName("192.168.1.117"), "1901");
+            socket.JoinMulticastGroup(new Windows.Networking.HostName("239.255.255.250"));
+
+            socket.Conn*/
             return _foundDevices;
         }
 
@@ -194,6 +205,10 @@ namespace HomeAutomationUWP.Helper_classes
             }
         }
 
+        /// <summary>
+        /// Sets scene of the light.
+        /// </summary>
+        /// <param name="lightModes">The scene to use.</param>
         public void SetScene(LightModes lightModes)
         {
             switch (lightModes)
@@ -207,6 +222,12 @@ namespace HomeAutomationUWP.Helper_classes
                 default:
                     break;
             }
+        }
+
+        public void Disconnect()
+        {
+            _tcpClient.Close();
+            _tcpClient.Dispose();
         }
 
         /// <summary>

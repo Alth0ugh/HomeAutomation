@@ -18,9 +18,16 @@
     </Page.Resources>
 
     <RelativePanel>
+        <StackPanel x:Name="informationPanel" Orientation="Vertical" Margin="10" RelativePanel.AlignHorizontalCenterWithPanel="True">
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock x:Name="ipText" Margin="0,0,10,0" Text="Pripojena ip:" />
+                <TextBlock RelativePanel.RightOf="ipText" RelativePanel.AlignVerticalCenterWith="ipText" Text="{Binding ConnectedDevice.DeviceCharacteristic.IpAddress}"/>
+            </StackPanel>
+            <Button HorizontalAlignment="Center" Content="Odpoj" Command="{Binding DisconnectLightCommand}"/>
+        </StackPanel>
         <Button x:Name="addDeviceButton" RelativePanel.AlignRightWithPanel="True" Margin="10, 10, 10, 0" Content="Add device" Command="{Binding OpenDeviceSelectorCommand}" Width="200"/>
         <StackPanel RelativePanel.AlignLeftWith="addDeviceButton" RelativePanel.AlignRightWith="addDeviceButton" RelativePanel.Below="addDeviceButton" Margin="10, 0, 10, 10">
-            <Popup x:Name="popup" IsOpen="{Binding IsSearchOpen}" Height="200" Width="{Binding ElementName=addDeviceButton, Path=Width}" IsLightDismissEnabled="True">
+            <Popup x:Name="popup" IsOpen="{Binding IsSearchOpen, Mode=TwoWay}" Height="200" Width="{Binding ElementName=addDeviceButton, Path=Width}" IsLightDismissEnabled="True">
                 <Border Visibility="{Binding IsSearchOpen}" 
                             Width="{Binding ElementName=popup, Path=Width}" 
                             Height="{Binding ElementName=popup, Path=Height}" 
@@ -60,19 +67,19 @@
             </Popup>
 
         </StackPanel>
-        <StackPanel RelativePanel.Below="addDeviceButton">
+        <StackPanel RelativePanel.Below="informationPanel">
             <TextBlock Text="Brightness:"/>
             <Slider Minimum="0" Maximum="100" Margin="10" Value="{Binding Brightness, Mode=TwoWay}"/>
             <TextBlock Text="Color temperature:"/>
             <controls:ColorTemperaturePicker Margin="10" Temperature="{Binding ColorTemperature, Mode=TwoWay}"/>
             <StackPanel Orientation="Horizontal">
-                <Button Margin="10" x:Name="dayButton" Command="{Binding ChangeSceneCommand}" CommandParameter="{Binding ElementName=dayButton}">
+                <Button Margin="10" IsEnabled="{Binding ControlsEnabled}" x:Name="dayButton" Command="{Binding ChangeSceneCommand}" CommandParameter="{Binding ElementName=dayButton}">
                     <iconPack:PackIconFontAwesome Kind="SunSolid"/>
                     <Button.Tag>
                         <enums:LightModes>DayMode</enums:LightModes>
                     </Button.Tag>
                 </Button>
-                <Button x:Name="nightButton" Margin="10" Command="{Binding ChangeSceneCommand}" CommandParameter="{Binding ElementName=nightButton}">
+                <Button x:Name="nightButton" IsEnabled="{Binding ControlsEnabled}" Margin="10" Command="{Binding ChangeSceneCommand}" CommandParameter="{Binding ElementName=nightButton}">
                     <iconPack:PackIconModern Kind="Moon"/>
                     <Button.Tag>
                         <enums:LightModes>NightMode</enums:LightModes>

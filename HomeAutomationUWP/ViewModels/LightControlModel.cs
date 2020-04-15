@@ -10,6 +10,8 @@ using HomeAutomationUWP.Helper_classes;
 using HomeAutomationUWP.Loggers;
 using HomeAutomationUWP.Helper_interfaces;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Core;
 
 namespace HomeAutomationUWP.ViewModels
 {
@@ -127,6 +129,20 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private ICommand _disconnectLightCommand;
+        public ICommand DisconnectLightCommand
+        {
+            get
+            {
+                return _disconnectLightCommand;
+            }
+            set
+            {
+                _disconnectLightCommand = value;
+                NotifyPropertyChanged("DisconnectLightCommand");
+            }
+        }
+
         private bool _isSearching;
         public bool IsSearching
         {
@@ -138,6 +154,20 @@ namespace HomeAutomationUWP.ViewModels
             {
                 _isSearching = value;
                 NotifyPropertyChanged("IsSearching");
+            }
+        }
+
+        private bool _controlsEnabled;
+        public bool ControlsEnabled
+        {
+            get
+            {
+                return _controlsEnabled;
+            }
+            set
+            {
+                _controlsEnabled = value;
+                NotifyPropertyChanged("ControlsEnabled");
             }
         }
 
@@ -170,11 +200,14 @@ namespace HomeAutomationUWP.ViewModels
             {
                 if (_selectedItem != null)
                 {
-                    _selectedItem.ConnectButtonVisibility = Windows.UI.Xaml.Visibility.Collapsed;
+                    _selectedItem.ConnectButtonVisibility = Visibility.Collapsed;
                 }
                 _selectedItem = value;
+                if (_selectedItem != null)
+                {
+                    _selectedItem.ConnectButtonVisibility = Visibility.Visible;
+                }
                 NotifyPropertyChanged("SelectedItem");
-                _selectedItem.ConnectButtonVisibility = Windows.UI.Xaml.Visibility.Visible;
             }
         }
 
@@ -188,6 +221,10 @@ namespace HomeAutomationUWP.ViewModels
             set
             {
                 _isSearchOpen = value;
+                if (!value)
+                {
+                    YeelightDevices.Clear();
+                }
                 NotifyPropertyChanged("IsSearchOpen");
             }
         }
@@ -233,7 +270,6 @@ namespace HomeAutomationUWP.ViewModels
                 NotifyPropertyChanged("ConnectingState");
             }
         }
-
         
         public LightControlModel()
         {
@@ -242,10 +278,22 @@ namespace HomeAutomationUWP.ViewModels
 
         private void SetCommands()
         {
-            SearchCommand = new RelayCommand(SearchForDevices);
-            OpenDeviceSelectorCommand = new RelayCommand(OpenDeviceSelector);
+            SearchCommand = new AsyncRelayCommand(SearchForDevices);
+            OpenDeviceSelectorCommand = new AsyncRelayCommand(OpenDeviceSelector);
             ConnectCommand = new RelayCommand(ConnectToLight);
             ChangeSceneCommand = new RelayCommand(SetLightMode);
+            DisconnectLightCommand = new RelayCommand(DisconnectLight);
+        }
+
+        private void DisconnectLight(object sender)
+        {
+            if (ConnectedDevice != null)
+            {
+                ConnectedDevice.Disconnect();
+                ConnectedDevice = null;
+                ControlsEnabled = false;
+
+            }
         }
 
         private void SetLightMode(object sender)
@@ -297,6 +345,8 @@ namespace HomeAutomationUWP.ViewModels
                 var deviceCharacteristic = obj as YeelightDeviceCharacteristic;
 
                 ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
+                ControlsEnabled = (ConnectedDevice.Connected) ? true : false;
+
                 if (ConnectedDevice.DeviceCharacteristic.Power == "on")
                 {
                     _brightness = deviceCharacteristic.Brightness;
@@ -312,21 +362,56 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
-        private async void OpenDeviceSelector(object obj)
+        private async Task OpenDeviceSelector(object obj)
         {
-            IsSearchOpen = true;
-            IsSearching = true;
-            var devices = await YeelightDevice.FindDevices();
-            IsSearching = false;
-            foreach (var device in devices)
+            await Task.Run(async () =>
             {
-                YeelightDevices.Add(device);
-            }
+                IsSearchOpen = true;
+                IsSearching = true;
+                var devices = await YeelightDevice.FindDevices();
+                IsSearching = false;
+
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    YeelightDevices.Clear();
+                });
+
+                foreach (var device in devices)
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        YeelightDevices.Add(device);
+                    });
+                }
+            });
         }
 
-        private void SearchForDevices(object obj)
+        private async Task SearchForDevices(object obj)
         {
-            IsSearching = IsSearching ? false : true;
+            await Task.Run(async () =>
+            {
+                if (IsSearching)
+                {
+                    return;
+                }
+
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    YeelightDevices.Clear();
+                });
+
+                IsSearching = true;
+                var devices = await YeelightDevice.FindDevices();
+                IsSearching = false;
+                foreach (var device in devices)
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                    {
+                        
+                         YeelightDevices.Add(device);
+                    });
+                }
+            });
         }
 
         public async void NavigatedTo()
