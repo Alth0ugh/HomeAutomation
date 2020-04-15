@@ -9,6 +9,7 @@ using System.Windows.Input;
 using HomeAutomationUWP.Helper_classes;
 using HomeAutomationUWP.Loggers;
 using HomeAutomationUWP.Helper_interfaces;
+using Windows.UI.Xaml.Controls;
 
 namespace HomeAutomationUWP.ViewModels
 {
@@ -109,6 +110,20 @@ namespace HomeAutomationUWP.ViewModels
             {
                 _connectCommand = value;
                 NotifyPropertyChanged("ConnectCommand");
+            }
+        }
+
+        private ICommand _changeSceneCommand;
+        public ICommand ChangeSceneCommand
+        {
+            get
+            {
+                return _changeSceneCommand;
+            }
+            set
+            {
+                _changeSceneCommand = value;
+                NotifyPropertyChanged("ChangeSceneCommand");
             }
         }
 
@@ -230,6 +245,30 @@ namespace HomeAutomationUWP.ViewModels
             SearchCommand = new RelayCommand(SearchForDevices);
             OpenDeviceSelectorCommand = new RelayCommand(OpenDeviceSelector);
             ConnectCommand = new RelayCommand(ConnectToLight);
+            ChangeSceneCommand = new RelayCommand(SetLightMode);
+        }
+
+        private void SetLightMode(object sender)
+        {
+            var button = sender as Button;
+            if (button == null)
+            {
+                return;
+            }
+
+            var tag = button.Tag;
+
+            switch (tag)
+            {
+                case (int)LightModes.NightMode:
+                    ConnectedDevice.SetScene(LightModes.NightMode);
+                    break;
+                case (int)LightModes.DayMode:
+                    ConnectedDevice.SetScene(LightModes.DayMode);
+                    break;
+                default:
+                    break;
+            }
         }
 
         private async void ConnectToLight(object obj)
@@ -305,5 +344,11 @@ namespace HomeAutomationUWP.ViewModels
                 ConnectToLight(onlineDevices.Find(o => o.IpAddress == previousCharacteristic.IpAddress));
             }
         }
+    }
+
+    public enum LightModes
+    {
+        DayMode = 1,
+        NightMode = 2
     }
 }

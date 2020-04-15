@@ -13,6 +13,7 @@ using System.IO;
 using System.Diagnostics;
 using Windows.UI.Xaml.Input;
 using Newtonsoft.Json;
+using HomeAutomationUWP.ViewModels;
 
 namespace HomeAutomationUWP.Helper_classes
 {
@@ -193,6 +194,21 @@ namespace HomeAutomationUWP.Helper_classes
             }
         }
 
+        public void SetScene(LightModes lightModes)
+        {
+            switch (lightModes)
+            {
+                case LightModes.NightMode:
+                    SendCommand(new YeelightCommand(_random.Next(1, 100), "set_scene", "nightlight", DeviceCharacteristic.Brightness));
+                    break;
+                case LightModes.DayMode:
+                    SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "on", "smooth", 0, 1));
+                    break;
+                default:
+                    break;
+            }
+        }
+
         /// <summary>
         /// Sends command to a device.
         /// </summary>
@@ -208,18 +224,31 @@ namespace HomeAutomationUWP.Helper_classes
             try
             {
                 networkStream.Write(MakeMessage(message), 0, message.Length);
+                /*while (networkStream.DataAvailable)
+                {
+                    Debug.Write((char)networkStream.ReadByte());
+                }
+                Debug.WriteLine("");*/
                 return;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 return;
+            }
+            finally
+            {
+                networkStream.Close();
+                networkStream.Dispose();
+                memoryStream.Close();
+                memoryStream.Dispose();
             }
         }
 
         private byte[] MakeMessage(string text)
         {
             var message = text + "\r\n";
-            return ASCIIEncoding.ASCII.GetBytes(message);
+            return Encoding.ASCII.GetBytes(message);
         }
     }
 

@@ -3,10 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:HomeAutomationUWP.Views"
+    xmlns:enums="using:HomeAutomationUWP.ViewModels"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls ="using:HomeAutomationUWP.Controls"
     xmlns:converters="using:HomeAutomationUWP.Converters"
+    xmlns:iconPack="using:MahApps.Metro.IconPacks"
     mc:Ignorable="d"
     x:Name="lightControl"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -63,6 +65,20 @@
             <Slider Minimum="0" Maximum="100" Margin="10" Value="{Binding Brightness, Mode=TwoWay}"/>
             <TextBlock Text="Color temperature:"/>
             <controls:ColorTemperaturePicker Margin="10" Temperature="{Binding ColorTemperature, Mode=TwoWay}"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Margin="10" x:Name="dayButton" Command="{Binding ChangeSceneCommand}" CommandParameter="{Binding ElementName=dayButton}">
+                    <iconPack:PackIconFontAwesome Kind="SunSolid"/>
+                    <Button.Tag>
+                        <enums:LightModes>DayMode</enums:LightModes>
+                    </Button.Tag>
+                </Button>
+                <Button x:Name="nightButton" Margin="10" Command="{Binding ChangeSceneCommand}" CommandParameter="{Binding ElementName=nightButton}">
+                    <iconPack:PackIconModern Kind="Moon"/>
+                    <Button.Tag>
+                        <enums:LightModes>NightMode</enums:LightModes>
+                    </Button.Tag>
+                </Button>
+            </StackPanel>
         </StackPanel>
     </RelativePanel>
 </Page>
