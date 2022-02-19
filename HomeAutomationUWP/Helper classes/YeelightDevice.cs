@@ -12,13 +12,17 @@ using System.Runtime.Serialization;
 using System.IO;
 using System.Diagnostics;
 using Windows.UI.Xaml.Input;
+using Newtonsoft.Json;
+using HomeAutomationUWP.ViewModels;
+using Windows.Networking.Sockets;
+using System.Threading;
 
 namespace HomeAutomationUWP.Helper_classes
 {
     public class YeelightDevice
     {
         private static IPEndPoint _remoteEndPoint = new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1982);
-        private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.116"), 1901);
+        private static IPEndPoint _localEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.117"), 1901);
         private TcpClient _tcpClient = new TcpClient();
         private Random _random = new Random();
         private DataContractJsonSerializer _serializer = new DataContractJsonSerializer(typeof(YeelightCommand));
@@ -45,22 +49,24 @@ namespace HomeAutomationUWP.Helper_classes
         /// <returns>List of device characteristics.</returns>
         public async static Task<List<YeelightDeviceCharacteristic>> FindDevices()
         {
-            var _udpclient = new UdpClient();
+            var _udpClient = new UdpClient();
             List<YeelightDeviceCharacteristic> _foundDevices = new List<YeelightDeviceCharacteristic>();
             // The following three lines allow multiple clients on the same PC
-            _udpclient.ExclusiveAddressUse = false;
-            _udpclient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _udpclient.ExclusiveAddressUse = false;
+            _udpClient.ExclusiveAddressUse = false;
+            _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _udpClient.ExclusiveAddressUse = false;
             // Bind, Join
-            _udpclient.Client.Bind(_localEndPoint);
-            _udpclient.JoinMulticastGroup(_remoteEndPoint.Address, _localEndPoint.Address);
+            _udpClient.Client.Bind(_localEndPoint);
+            _udpClient.JoinMulticastGroup(_remoteEndPoint.Address, _localEndPoint.Address);
 
             var bufferToSend = Encoding.UTF8.GetBytes("M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1982\r\nMAN: \"ssdp:discover\"\r\nST: wifi_bulb\r\n");
-            await _udpclient.SendAsync(bufferToSend, bufferToSend.Length, _remoteEndPoint);
+            await _udpClient.SendAsync(bufferToSend, bufferToSend.Length, _remoteEndPoint);
 
-            while (_udpclient.Available > 0)
+            Thread.Sleep(50);
+            
+            while (_udpClient.Available > 0)
             {
-                var buffer = (await _udpclient.ReceiveAsync()).Buffer;
+                var buffer = (await _udpClient.ReceiveAsync()).Buffer;
                 string message = string.Empty;
                 foreach (var character in buffer)
                 {
@@ -69,6 +75,15 @@ namespace HomeAutomationUWP.Helper_classes
                 _foundDevices.Add(GetDeviceCharacteristic(message));
             }
 
+            _udpClient.Close();
+            _udpClient.Dispose();
+            /*
+            List<YeelightDeviceCharacteristic> _foundDevices = new List<YeelightDeviceCharacteristic>();
+            var socket = new DatagramSocket();
+            await socket.BindEndpointAsync(new Windows.Networking.HostName("192.168.1.117"), "1901");
+            socket.JoinMulticastGroup(new Windows.Networking.HostName("239.255.255.250"));
+
+            socket.Conn*/
             return _foundDevices;
         }
 
@@ -149,6 +164,8 @@ namespace HomeAutomationUWP.Helper_classes
             {
                 return;
             }
+
+            DeviceCharacteristic.ColorTemperature = value;
             SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
         }
 
@@ -163,6 +180,7 @@ namespace HomeAutomationUWP.Helper_classes
                 return;
             }
 
+            DeviceCharacteristic.Brightness = value;
             SendCommand(new YeelightCommand(_random.Next(1, 100), "set_bright", value, "sudden", 0));
         }
 
@@ -188,6 +206,31 @@ namespace HomeAutomationUWP.Helper_classes
         }
 
         /// <summary>
+        /// Sets scene of the light.
+        /// </summary>
+        /// <param name="lightModes">The scene to use.</param>
+        public void SetScene(LightModes lightModes)
+        {
+            switch (lightModes)
+            {
+                case LightModes.NightMode:
+                    SendCommand(new YeelightCommand(_random.Next(1, 100), "set_scene", "nightlight", DeviceCharacteristic.Brightness));
+                    break;
+                case LightModes.DayMode:
+                    SendCommand(new YeelightCommand(_random.Next(1, 100), "set_power", "on", "smooth", 0, 1));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void Disconnect()
+        {
+            _tcpClient.Close();
+            _tcpClient.Dispose();
+        }
+
+        /// <summary>
         /// Sends command to a device.
         /// </summary>
         /// <param name="yeelightCommand">Instance of Yeelight command.</param>
@@ -202,18 +245,31 @@ namespace HomeAutomationUWP.Helper_classes
             try
             {
                 networkStream.Write(MakeMessage(message), 0, message.Length);
+                /*while (networkStream.DataAvailable)
+                {
+                    Debug.Write((char)networkStream.ReadByte());
+                }
+                Debug.WriteLine("");*/
                 return;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 return;
+            }
+            finally
+            {
+                networkStream.Close();
+                networkStream.Dispose();
+                memoryStream.Close();
+                memoryStream.Dispose();
             }
         }
 
         private byte[] MakeMessage(string text)
         {
             var message = text + "\r\n";
-            return ASCIIEncoding.ASCII.GetBytes(message);
+            return Encoding.ASCII.GetBytes(message);
         }
     }
 
@@ -241,12 +297,12 @@ namespace HomeAutomationUWP.Helper_classes
         }
     }   
 
-    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class YeelightDeviceCharacteristic : BindableBase
     {
-        [DataMember]
+        [JsonProperty]
         public string IpAddress { get; }
-        [DataMember]
+        [JsonProperty]
         public int Port { get; }
         public List<string> AvaliableMethods { get; }
         private Visibility _connectButtonVisibility;

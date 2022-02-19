@@ -10,7 +10,7 @@ namespace HomeAutomationUWP.Loggers
 {
     public static class ConfigReader
     {
-        public static async Task<object> ReadEntireConfigAsync(ConfigType configType)
+        public static async Task<T> ReadEntireConfigAsync<T>(ConfigType configType)
         {
             switch (configType)
             {
@@ -20,7 +20,7 @@ namespace HomeAutomationUWP.Loggers
                     var file = await storageFolder.TryGetItemAsync(fileName);
                     if (file == null)
                     {
-                        return null;
+                        return default(T);
                     }
                     var fileForRead = await storageFolder.OpenStreamForReadAsync(fileName);
                     string json = string.Empty;
@@ -30,10 +30,10 @@ namespace HomeAutomationUWP.Loggers
                         json += (char)fileForRead.ReadByte();
                     }
 
-                    return JsonConvert.DeserializeObject(json);
+                    return JsonConvert.DeserializeObject<T>(json);
                     break;
                 default:
-                    return null;
+                    return default(T);
             }
         }
     }

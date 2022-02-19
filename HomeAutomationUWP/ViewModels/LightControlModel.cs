@@ -8,10 +8,14 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using HomeAutomationUWP.Helper_classes;
 using HomeAutomationUWP.Loggers;
+using HomeAutomationUWP.Helper_interfaces;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Core;
 
 namespace HomeAutomationUWP.ViewModels
 {
-    public class LightControlModel : BindableBase
+    public class LightControlModel : BindableBase, INavigateAction
     {
         private double _colorTemperature = 2700;
         public double ColorTemperature
@@ -111,6 +115,34 @@ namespace HomeAutomationUWP.ViewModels
             }
         }
 
+        private ICommand _changeSceneCommand;
+        public ICommand ChangeSceneCommand
+        {
+            get
+            {
+                return _changeSceneCommand;
+            }
+            set
+            {
+                _changeSceneCommand = value;
+                NotifyPropertyChanged("ChangeSceneCommand");
+            }
+        }
+
+        private ICommand _disconnectLightCommand;
+        public ICommand DisconnectLightCommand
+        {
+            get
+            {
+                return _disconnectLightCommand;
+            }
+            set
+            {
+                _disconnectLightCommand = value;
+                NotifyPropertyChanged("DisconnectLightCommand");
+            }
+        }
+
         private bool _isSearching;
         public bool IsSearching
         {
@@ -122,6 +154,20 @@ namespace HomeAutomationUWP.ViewModels
             {
                 _isSearching = value;
                 NotifyPropertyChanged("IsSearching");
+            }
+        }
+
+        private bool _controlsEnabled;
+        public bool ControlsEnabled
+        {
+            get
+            {
+                return _controlsEnabled;
+            }
+            set
+            {
+                _controlsEnabled = value;
+                NotifyPropertyChanged("ControlsEnabled");
             }
         }
 
@@ -154,11 +200,14 @@ namespace HomeAutomationUWP.ViewModels
             {
                 if (_selectedItem != null)
                 {
-                    _selectedItem.ConnectButtonVisibility = Windows.UI.Xaml.Visibility.Collapsed;
+                    _selectedItem.ConnectButtonVisibility = Visibility.Collapsed;
                 }
                 _selectedItem = value;
+                if (_selectedItem != null)
+                {
+                    _selectedItem.ConnectButtonVisibility = Visibility.Visible;
+                }
                 NotifyPropertyChanged("SelectedItem");
-                _selectedItem.ConnectButtonVisibility = Windows.UI.Xaml.Visibility.Visible;
             }
         }
 
@@ -172,6 +221,10 @@ namespace HomeAutomationUWP.ViewModels
             set
             {
                 _isSearchOpen = value;
+                if (!value)
+                {
+                    YeelightDevices.Clear();
+                }
                 NotifyPropertyChanged("IsSearchOpen");
             }
         }
@@ -217,7 +270,6 @@ namespace HomeAutomationUWP.ViewModels
                 NotifyPropertyChanged("ConnectingState");
             }
         }
-
         
         public LightControlModel()
         {
@@ -226,43 +278,162 @@ namespace HomeAutomationUWP.ViewModels
 
         private void SetCommands()
         {
-            SearchCommand = new RelayCommand(SearchForDevices);
-            OpenDeviceSelectorCommand = new RelayCommand(OpenDeviceSelector);
+            SearchCommand = new AsyncRelayCommand(SearchForDevices);
+            OpenDeviceSelectorCommand = new AsyncRelayCommand(OpenDeviceSelector);
             ConnectCommand = new RelayCommand(ConnectToLight);
+            ChangeSceneCommand = new RelayCommand(SetLightMode);
+            DisconnectLightCommand = new RelayCommand(DisconnectLight);
         }
 
-        private async void ConnectToLight(object obj)
+        private void DisconnectLight(object sender)
         {
-            var deviceCharacteristic = obj as YeelightDeviceCharacteristic;
-            if (deviceCharacteristic == null)
+            if (ConnectedDevice != null)
+            {
+                ConnectedDevice.Disconnect();
+                ConnectedDevice = null;
+                ControlsEnabled = false;
+
+            }
+        }
+
+        private void SetLightMode(object sender)
+        {
+            var button = sender as Button;
+            if (button == null)
             {
                 return;
             }
 
-            ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
-            ConnectedDevice.SetPower(true);
-            _brightness = deviceCharacteristic.Brightness;
-            NotifyPropertyChanged("Brightness");
-            _colorTemperature = deviceCharacteristic.ColorTemperature;
-            NotifyPropertyChanged("ColorTemperature");
-            await ConfigLogger.Log(ConfigType.LightConfig, deviceCharacteristic);
-        }
+            var tag = button.Tag;
 
-        private async void OpenDeviceSelector(object obj)
-        {
-            IsSearchOpen = true;
-            IsSearching = true;
-            var devices = await YeelightDevice.FindDevices();
-            IsSearching = false;
-            foreach (var device in devices)
+            switch (tag)
             {
-                YeelightDevices.Add(device);
+                case (int)LightModes.NightMode:
+                    ConnectedDevice.SetScene(LightModes.NightMode);
+                    break;
+                case (int)LightModes.DayMode:
+                    ConnectedDevice.SetScene(LightModes.DayMode);
+                    break;
+                default:
+                    break;
             }
         }
 
-        private void SearchForDevices(object obj)
+        private async void ConnectToLight(object obj)
         {
-            IsSearching = IsSearching ? false : true;
+                /*
+            if (obj is Task<YeelightDeviceCharacteristic>)
+            {
+                previousCharacteristic = await (obj as Task<YeelightDeviceCharacteristic>);
+                var onlineDevices = await YeelightDevice.FindDevices();
+                YeelightDeviceCharacteristic editedCharacteristic;
+
+                if (onlineDevices.Exists(o => o.IpAddress == ((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress))
+                {
+                    var device = onlineDevices.Find(o => o.IpAddress == ((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress);
+                    editedCharacteristic = new YeelightDeviceCharacteristic(((YeelightDeviceCharacteristic)previousCharacteristic).IpAddress, device.Port, device.AvaliableMethods);
+                    ConnectedDevice = await YeelightDevice.Connect(editedCharacteristic);
+                    _brightness = device.Brightness;
+                    NotifyPropertyChanged("Brightness");
+                    _colorTemperature = device.ColorTemperature;
+                    NotifyPropertyChanged("ColorTemperature");
+                }
+            }
+            */
+            if (obj is YeelightDeviceCharacteristic)
+            {
+                var deviceCharacteristic = obj as YeelightDeviceCharacteristic;
+
+                ConnectedDevice = await YeelightDevice.Connect(deviceCharacteristic);
+                ControlsEnabled = (ConnectedDevice.Connected) ? true : false;
+
+                if (ConnectedDevice.DeviceCharacteristic.Power == "on")
+                {
+                    _brightness = deviceCharacteristic.Brightness;
+                }
+                else
+                {
+                    _brightness = 0;
+                }
+                NotifyPropertyChanged("Brightness");
+                _colorTemperature = deviceCharacteristic.ColorTemperature;
+                NotifyPropertyChanged("ColorTemperature");
+                await ConfigLogger.Log(ConfigType.LightConfig, deviceCharacteristic);
+            }
         }
+
+        private async Task OpenDeviceSelector(object obj)
+        {
+            await Task.Run(async () =>
+            {
+                IsSearchOpen = true;
+                IsSearching = true;
+                var devices = await YeelightDevice.FindDevices();
+                IsSearching = false;
+
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    YeelightDevices.Clear();
+                });
+
+                foreach (var device in devices)
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        YeelightDevices.Add(device);
+                    });
+                }
+            });
+        }
+
+        private async Task SearchForDevices(object obj)
+        {
+            await Task.Run(async () =>
+            {
+                if (IsSearching)
+                {
+                    return;
+                }
+
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    YeelightDevices.Clear();
+                });
+
+                IsSearching = true;
+                var devices = await YeelightDevice.FindDevices();
+                IsSearching = false;
+                foreach (var device in devices)
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                    {
+                        
+                         YeelightDevices.Add(device);
+                    });
+                }
+            });
+        }
+
+        public async void NavigatedTo()
+        {
+            var onlineDevices = await YeelightDevice.FindDevices();
+            var previousCharacteristic = await ConfigReader.ReadEntireConfigAsync<YeelightDeviceCharacteristic>(ConfigType.LightConfig);
+
+            if (previousCharacteristic == null)
+            {
+                return;
+            }
+
+            if (onlineDevices.Exists(o => o.IpAddress == previousCharacteristic.IpAddress))
+            {
+                ConnectToLight(onlineDevices.Find(o => o.IpAddress == previousCharacteristic.IpAddress));
+            }
+        }
+    }
+
+    public enum LightModes
+    {
+        DayMode = 1,
+        NightMode = 2
     }
 }
