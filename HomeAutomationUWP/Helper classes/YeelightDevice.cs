@@ -266,12 +266,6 @@ namespace HomeAutomationUWP.Helper_classes
             var message = text + "\r\n";
             return Encoding.ASCII.GetBytes(message);
         }
-
-        private byte[] MakeMessage(string text)
-        {
-            var message = text + "\r\n";
-            return ASCIIEncoding.ASCII.GetBytes(message);
-        }
     }
 
     [DataContract]
