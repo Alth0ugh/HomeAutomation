@@ -16,10 +16,11 @@ namespace HomeAutomationUWP.Converters
                 switch ((int)value)
                 {
                     case 1:
-                        return true;
+                        return "On";
                     case 0:
+                        return "Off";
                     case -1:
-                        return false;
+                        return "Err";
                 }
             }
             return "Err";
@@ -27,17 +28,7 @@ namespace HomeAutomationUWP.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            if (value is bool)
-            {
-                switch ((bool)value)
-                {
-                    case true:
-                        return 1;
-                    case false:
-                        return 0;
-                }
-            }
-            return 0;
+            throw new NotImplementedException();
         }
     }
 }

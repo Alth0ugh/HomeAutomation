@@ -33,10 +33,10 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0">
-            <!--<TextBlock Text="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=OneWay}" VerticalAlignment="Center"/>-->
-            <!--<Button x:Name="OnOffButton" 
+            <TextBlock Text="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=OneWay}" VerticalAlignment="Center"/>
+            <Button x:Name="OnOffButton" 
                     Content="{Binding PoolPower, Converter={StaticResource IntToOnOffOpposite}, Mode=OneWay}" 
-                    Command="{Binding OnOffCommand}"/>-->
+                    Command="{Binding OnOffCommand}"/>
             <CheckBox Content="Manual" IsChecked="{Binding ManualMode, Mode=TwoWay}"/>
             <ToggleSwitch Header="Power" IsOn="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=TwoWay}" IsEnabled="{Binding ManualMode}"/>
             <Button HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10">

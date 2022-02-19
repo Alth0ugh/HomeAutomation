@@ -164,7 +164,7 @@ namespace HomeAutomationUWP.Helper_classes
             {
                 return;
             }
-
+          
             DeviceCharacteristic.ColorTemperature = value;
             SendCommand(new YeelightCommand(_random.Next(1, 100), "set_ct_abx", value, "sudden", 0));
         }
@@ -245,11 +245,6 @@ namespace HomeAutomationUWP.Helper_classes
             try
             {
                 networkStream.Write(MakeMessage(message), 0, message.Length);
-                /*while (networkStream.DataAvailable)
-                {
-                    Debug.Write((char)networkStream.ReadByte());
-                }
-                Debug.WriteLine("");*/
                 return;
             }
             catch (Exception ex)
@@ -270,6 +265,12 @@ namespace HomeAutomationUWP.Helper_classes
         {
             var message = text + "\r\n";
             return Encoding.ASCII.GetBytes(message);
+        }
+
+        private byte[] MakeMessage(string text)
+        {
+            var message = text + "\r\n";
+            return ASCIIEncoding.ASCII.GetBytes(message);
         }
     }
 
