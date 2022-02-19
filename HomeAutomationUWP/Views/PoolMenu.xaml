@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converters="using:HomeAutomationUWP.Converters"
     xmlns:controls="using:HomeAutomationUWP.Controls"
+    xmlns:iconPacks="using:MahApps.Metro.IconPacks"
     mc:Ignorable="d"
     x:Name="poolMenu"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -36,19 +37,29 @@
             <Button x:Name="OnOffButton" 
                     Content="{Binding PoolPower, Converter={StaticResource IntToOnOffOpposite}, Mode=OneWay}" 
                     Command="{Binding OnOffCommand}"/>
-            <Button Content="Refresh" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10"/>
+            <CheckBox Content="Manual" IsChecked="{Binding ManualMode, Mode=TwoWay}"/>
+            <ToggleSwitch Header="Power" IsOn="{Binding PoolPower, Converter={StaticResource IntToOnOff}, Mode=TwoWay}" IsEnabled="{Binding ManualMode}"/>
+            <Button HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0" Command="{Binding ReconnectCommand}" Margin="10">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial Kind="Refresh" Margin="0,10, 10, 10"/>
+                    <TextBlock FontSize="22" Text="Refresh" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Content="+" Command="{Binding AddTimeCommand}"/>
+            <Button Command="{Binding AddTimeCommand}">
+                <iconPacks:PackIconMaterial Kind="Plus"/>
+            </Button>
         </StackPanel>
 
         <ScrollViewer Grid.Column="0" Grid.Row="1">
             <ItemsControl ItemsSource="{Binding ListOfTimeSelectors}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <controls:TimeSelector From="{Binding FromTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"
-                                               To="{Binding ToTime, Converter={StaticResource UShortToUShort}, Mode=TwoWay}"/>
+                        <controls:TimeSelector DeleteEntry="{Binding ElementName=poolMenu, Path=DataContext.DeleteTime }"
+                                               CurrentCharacteristic="{Binding}"
+                                               Margin="0,0,0,10"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

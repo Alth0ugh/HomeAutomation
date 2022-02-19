@@ -23,7 +23,6 @@ namespace HomeAutomationUWP.Helper_classes
             catch (Exception e)
             {
                 Listen();
-                throw e;
             }
         }
 
@@ -39,7 +38,6 @@ namespace HomeAutomationUWP.Helper_classes
             catch (Exception e)
             {
                 Listen();
-                throw e;
             }
         }
 

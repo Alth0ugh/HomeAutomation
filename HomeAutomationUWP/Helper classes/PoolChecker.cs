@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using HomeAutomationUWP.Controls;
+using Newtonsoft.Json;
 
 namespace HomeAutomationUWP.Helper_classes
 {
@@ -60,13 +61,13 @@ namespace HomeAutomationUWP.Helper_classes
 
             var serializer = new DataContractJsonSerializer(typeof(List<TimeSelectorCharacteristic>));
 
-            using (var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite))
-            {
-                using (var outputStream = stream.GetOutputStreamAt(0))
-                {
-                    serializer.WriteObject(outputStream.AsStreamForWrite(), PoolTimes);
-                }
-            }
+            var jsonString = JsonConvert.SerializeObject(PoolTimes);
+            var data = Encoding.ASCII.GetBytes(jsonString);
+            var openedFile = await file.OpenStreamForWriteAsync();
+            openedFile.Flush();
+            openedFile.Write(data, 0, data.Length);
+            openedFile.Close();
+            openedFile.Dispose();
         }
 
         /// <summary>
@@ -102,35 +103,6 @@ namespace HomeAutomationUWP.Helper_classes
                 {
                     top.ToTime = oldArray[i].ToTime;
                 }
-                /*
-                int j = i + 1;
-                //for (int j = i + 1; j < PoolTimes.Count; j++)
-                while(j < PoolTimes.Count)
-                {
-                    if (PoolTimes[j].FromTime == PoolTimes[i].FromTime && PoolTimes[j].ToTime == PoolTimes[i].ToTime)
-                    {
-                        PoolTimes.RemoveAt(j);
-                    }
-                    else if (PoolTimes[j].FromTime <= PoolTimes[i].FromTime && PoolTimes[j].ToTime >= PoolTimes[i].FromTime)
-                    {
-                        PoolTimes[i].FromTime = PoolTimes[j].FromTime;
-                        PoolTimes.RemoveAt(j);
-                    }
-                    else if (PoolTimes[j].ToTime >= PoolTimes[i].ToTime && PoolTimes[j].FromTime <= PoolTimes[i].ToTime)
-                    {
-                        PoolTimes[i].ToTime = PoolTimes[j].ToTime;
-                        PoolTimes.RemoveAt(j);
-                    }
-                    else if (PoolTimes[j].FromTime < PoolTimes[i].FromTime && PoolTimes[j].ToTime > PoolTimes[i].ToTime)
-                    {
-                        PoolTimes.RemoveAt(i);
-                    }
-                    else
-                    {
-                        j++;
-                    }
-                }
-                */
             }
             newArray.Reverse();
             PoolTimes = newArray;
@@ -149,9 +121,20 @@ namespace HomeAutomationUWP.Helper_classes
                 return new List<TimeSelectorCharacteristic>();
             }
             var file = await storageFolder.OpenStreamForReadAsync("test.txt");
+            string json = string.Empty;
 
-            var serializer = new DataContractJsonSerializer(typeof(List<TimeSelectorCharacteristic>));
-            return (List<TimeSelectorCharacteristic>)serializer.ReadObject(file);
+            for (int i = 0; i < file.Length; i++)
+            {
+                json += (char)file.ReadByte();
+            }
+
+            var data = JsonConvert.DeserializeObject<List<TimeSelectorCharacteristic>>(json);
+
+            if (data != null)
+            {
+                return (List<TimeSelectorCharacteristic>)data;
+            }
+            return new List<TimeSelectorCharacteristic>();
         }
 
 
